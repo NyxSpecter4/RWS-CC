@@ -5,13 +5,14 @@ import LeaseManager from './pages/LeaseManager';
 import RentRoll from './pages/RentRoll';
 import FinancialDashboard from './pages/FinancialDashboard';
 import Operations from './pages/Operations';
+import DocumentAI from './pages/DocumentAI';
 
 function App() {
   const [confirmedTenants, setConfirmedTenants] = useState([]);
   const [placeholderCount, setPlaceholderCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard', 'leaseManager', 'rentRoll', 'financialDashboard', 'operations'
+  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard', 'leaseManager', 'rentRoll', 'financialDashboard', 'operations', 'documentAI'
 
   useEffect(() => {
     async function fetchTenants() {
@@ -65,6 +66,9 @@ function App() {
     }
     if (currentView === 'operations') {
       return <Operations />;
+    }
+    if (currentView === 'documentAI') {
+      return <DocumentAI />;
     }
 
     // Default dashboard view
@@ -215,6 +219,15 @@ function App() {
                 onClick={(e) => handleNavClick('operations', e)}
               >
                 Operations
+              </a>
+            </li>
+            <li className="nav-item">
+              <a
+                href="/ai-tools"
+                className="nav-links"
+                onClick={(e) => handleNavClick('documentAI', e)}
+              >
+                AI Tools
               </a>
             </li>
           </ul>
