@@ -68,17 +68,17 @@ function App() {
     async function fetchBriefData() {
       try {
         setLoadingBrief(true);
-        // 1. Lease expirations within next 90 days
-        const today = new Date().toISOString().split('T')[0];
-        const futureDate = new Date();
-        futureDate.setDate(futureDate.getDate() + 90);
-        const futureDateStr = futureDate.toISOString().split('T')[0];
-
+        // 1. Lease expirations within next 90 days (using updated schema with joins)
         const { data: leases, error: leasesError } = await supabase
           .from('leases')
-          .select('id, tenant_name, end_date')
-          .gte('end_date', today)
-          .lte('end_date', futureDateStr)
+          .select(`
+            id,
+            end_date,
+            tenants ( name ),
+            units ( suite_number )
+          `)
+          .lt('end_date', new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString())
+          .gt('end_date', new Date().toISOString())
           .order('end_date', { ascending: true });
 
         if (leasesError) throw leasesError;
@@ -196,7 +196,7 @@ function App() {
                     <ul className="brief-list">
                       {leaseExpirations.slice(0, 3).map(lease => (
                         <li key={lease.id}>
-                          <strong>{lease.tenant_name}</strong> – {new Date(lease.end_date).toLocaleDateString()}
+                          <strong>{lease.tenants?.name || 'Unknown'}</strong> – {new Date(lease.end_date).toLocaleDateString()}
                         </li>
                       ))}
                       {leaseExpirations.length > 3 && (
