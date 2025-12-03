@@ -30,32 +30,30 @@ const DocumentAI = () => {
     setParsing(true);
     setMessage('Parsing with AI...');
 
-    // In a real implementation, you would upload the PDF to your backend
-    // and call DeepSeek API with the file content.
-    // For this demo, we'll simulate an API call with a timeout.
-    setTimeout(() => {
-      const mockResult = documentType === 'lease'
-        ? {
-            tenant_name: 'Acme Corporation',
-            start_date: '2025-01-01',
-            end_date: '2029-12-31',
-            base_rent: 12500,
-            escalation_rate: 3.5,
-            cam_responsibilities: 'Tenant pays 20% of common area maintenance',
-          }
-        : {
-            vendor_name: 'SecureTech Solutions',
-            start_date: '2024-06-15',
-            end_date: '2025-06-14',
-            scope_of_work: 'Monthly security system maintenance and monitoring',
-            rate: 850,
-            renewal_terms: 'Automatic annual renewal with 5% increase',
-          };
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('documentType', documentType);
 
-      setParsedData(mockResult);
-      setParsing(false);
+    try {
+      const response = await fetch('/api/parse-document', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+
+      const result = await response.json();
+      setParsedData(result);
       setMessage('Parsing complete! Review the extracted data below.');
-    }, 2000);
+    } catch (err) {
+      console.error('Parse error:', err);
+      setMessage('Error parsing document: ' + err.message);
+      setParsedData(null);
+    } finally {
+      setParsing(false);
+    }
   };
 
   const handleImport = async () => {
@@ -225,7 +223,7 @@ const DocumentAI = () => {
             <li>Click "Import to Database" to save the data into the correct table (leases or vendor_contracts).</li>
           </ol>
           <p className="help-text">
-            <strong>Note:</strong> This demo uses mock data. To enable real AI parsing, set up a backend endpoint that calls the DeepSeek API with your API key.
+            <strong>Note:</strong> The PDF is sent to a backend endpoint that uses AI to extract key terms. Ensure your backend is running at /api/parse-document.
           </p>
         </div>
       </div>

@@ -172,7 +172,7 @@ function App() {
                 className="nav-links"
                 onClick={(e) => handleNavClick('dashboard', e)}
               >
-                Dashboard
+                Overview
               </a>
             </li>
             <li className="nav-item">
@@ -181,7 +181,7 @@ function App() {
                 className="nav-links"
                 onClick={(e) => handleNavClick('reports', e)}
               >
-                Reports
+                All Reports
               </a>
             </li>
             <li className="nav-item">
@@ -190,7 +190,7 @@ function App() {
                 className="nav-links"
                 onClick={(e) => handleNavClick('settings', e)}
               >
-                Settings
+                Setup
               </a>
             </li>
             <li className="nav-item">
@@ -199,7 +199,7 @@ function App() {
                 className="nav-links"
                 onClick={(e) => handleNavClick('leaseManager', e)}
               >
-                Lease Manager
+                Leases
               </a>
             </li>
             <li className="nav-item">
@@ -208,7 +208,7 @@ function App() {
                 className="nav-links"
                 onClick={(e) => handleNavClick('rentRoll', e)}
               >
-                Rent Roll
+                Rent Report
               </a>
             </li>
             <li className="nav-item">
@@ -217,7 +217,7 @@ function App() {
                 className="nav-links"
                 onClick={(e) => handleNavClick('financialDashboard', e)}
               >
-                Financials
+                Property Value
               </a>
             </li>
             <li className="nav-item">
@@ -226,7 +226,7 @@ function App() {
                 className="nav-links"
                 onClick={(e) => handleNavClick('operations', e)}
               >
-                Operations
+                Day-to-Day Ops
               </a>
             </li>
             <li className="nav-item">
@@ -235,7 +235,7 @@ function App() {
                 className="nav-links"
                 onClick={(e) => handleNavClick('documentAI', e)}
               >
-                AI Tools
+                Upload Docs (AI)
               </a>
             </li>
           </ul>
