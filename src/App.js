@@ -10,11 +10,27 @@ import Reports from './pages/Reports';
 import Settings from './pages/Settings';
 
 function App() {
+  const [authenticated, setAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const [confirmedTenants, setConfirmedTenants] = useState([]);
   const [placeholderCount, setPlaceholderCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard', 'leaseManager', 'rentRoll', 'financialDashboard', 'operations', 'documentAI', 'reports', 'settings'
+  const [leaseExpirations, setLeaseExpirations] = useState([]);
+  const [openItemsCount, setOpenItemsCount] = useState(0);
+  const [loadingBrief, setLoadingBrief] = useState(true);
+
+  const handlePasswordSubmit = (e) => {
+    e.preventDefault();
+    if (password === 'etosha') {
+      setAuthenticated(true);
+      setPasswordError('');
+    } else {
+      setPasswordError('Incorrect password. Please try again.');
+    }
+  };
 
   useEffect(() => {
     async function fetchTenants() {
@@ -46,6 +62,55 @@ function App() {
     }
 
     fetchTenants();
+  }, []);
+
+  useEffect(() => {
+    async function fetchBriefData() {
+      try {
+        setLoadingBrief(true);
+        // 1. Lease expirations within next 90 days
+        const today = new Date().toISOString().split('T')[0];
+        const futureDate = new Date();
+        futureDate.setDate(futureDate.getDate() + 90);
+        const futureDateStr = futureDate.toISOString().split('T')[0];
+
+        const { data: leases, error: leasesError } = await supabase
+          .from('leases')
+          .select('id, tenant_name, end_date')
+          .gte('end_date', today)
+          .lte('end_date', futureDateStr)
+          .order('end_date', { ascending: true });
+
+        if (leasesError) throw leasesError;
+        setLeaseExpirations(leases || []);
+
+        // 2. Open work orders (status != 'completed')
+        const { count: workOrdersCount, error: workOrdersError } = await supabase
+          .from('work_orders')
+          .select('*', { count: 'exact', head: true })
+          .neq('status', 'completed');
+
+        if (workOrdersError) throw workOrdersError;
+
+        // 3. Open incidents (resolved = false)
+        const { count: incidentsCount, error: incidentsError } = await supabase
+          .from('incidents')
+          .select('*', { count: 'exact', head: true })
+          .eq('resolved', false);
+
+        if (incidentsError) throw incidentsError;
+
+        const totalOpen = (workOrdersCount || 0) + (incidentsCount || 0);
+        setOpenItemsCount(totalOpen);
+      } catch (err) {
+        console.error('Error fetching brief data:', err);
+        // We can optionally set an error state, but for now just log
+      } finally {
+        setLoadingBrief(false);
+      }
+    }
+
+    fetchBriefData();
   }, []);
 
 
@@ -114,6 +179,61 @@ function App() {
           </div>
         </section>
 
+        {/* AI Morning Brief Widget */}
+        <section className="ai-brief-widget">
+          <h3>Your AI Brief</h3>
+          <div className="brief-content">
+            {loadingBrief ? (
+              <p>Loading brief...</p>
+            ) : (
+              <>
+                <div className="brief-item">
+                  <div className="brief-header">
+                    <span className="brief-title">Lease Expirations</span>
+                    <span className="brief-badge">{leaseExpirations.length} within 90 days</span>
+                  </div>
+                  {leaseExpirations.length > 0 ? (
+                    <ul className="brief-list">
+                      {leaseExpirations.slice(0, 3).map(lease => (
+                        <li key={lease.id}>
+                          <strong>{lease.tenant_name}</strong> – {new Date(lease.end_date).toLocaleDateString()}
+                        </li>
+                      ))}
+                      {leaseExpirations.length > 3 && (
+                        <li className="brief-more">+{leaseExpirations.length - 3} more</li>
+                      )}
+                    </ul>
+                  ) : (
+                    <p className="brief-empty">No leases expiring soon.</p>
+                  )}
+                </div>
+
+                <div className="brief-item">
+                  <div className="brief-header">
+                    <span className="brief-title">Expense Alerts</span>
+                    <span className="brief-badge info">Info</span>
+                  </div>
+                  <p className="brief-static">
+                    AI Expense Monitoring Ready – Add expense data to enable.
+                  </p>
+                </div>
+
+                <div className="brief-item">
+                  <div className="brief-header">
+                    <span className="brief-title">Open Items</span>
+                    <span className="brief-badge warning">{openItemsCount} pending</span>
+                  </div>
+                  <p className="brief-static">
+                    {openItemsCount === 0
+                      ? 'All caught up! No open work orders or incidents.'
+                      : `${openItemsCount} open work orders or incidents require attention.`}
+                  </p>
+                </div>
+              </>
+            )}
+          </div>
+        </section>
+
         {/* Grid Layout for Cards */}
         <div className="dashboard-grid">
           {/* Card 1: Valuation Snapshot */}
@@ -153,7 +273,7 @@ function App() {
             </div>
             <div className="card-content">
               {error ? (
-                <p className="error-message" style={{ color: '#9C4A3C' }}>{error}</p>
+                <p className="error-message color-redwood">{error}</p>
               ) : loading ? (
                 <p>Loading tenants...</p>
               ) : (
@@ -172,7 +292,8 @@ function App() {
                             <a
                               href="#"
                               onClick={(e) => { e.preventDefault(); handleNavClick('leaseManager', e); }}
-                              style={{ color: '#40E0D0', textDecoration: 'none', fontWeight: '600' }}
+                              className="color-turquoise"
+                              style={{ textDecoration: 'none', fontWeight: '600' }}
                             >
                               View All ({confirmedTenants.length})
                             </a>
@@ -184,7 +305,7 @@ function App() {
                     )}
                   </div>
                   {placeholderCount > 0 && (
-                    <p className="placeholder-note" style={{ color: '#9C4A3C', marginTop: '0.5rem', fontSize: '0.8rem' }}>
+                    <p className="placeholder-note color-redwood" style={{ marginTop: '0.5rem', fontSize: '0.8rem' }}>
                       +{placeholderCount} placeholder units to fill
                     </p>
                   )}
@@ -200,93 +321,118 @@ function App() {
 
   return (
     <div className="App">
-      {/* Top Navigation Bar */}
-      <nav className="navbar">
-        <div className="navbar-container">
-          <h1 className="navbar-logo">Redwood Square Command Center</h1>
-          <ul className="nav-menu">
-            <li className="nav-item">
-              <a
-                href="#dashboard"
-                className="nav-links"
-                onClick={(e) => handleNavClick('dashboard', e)}
-              >
-                Home
-              </a>
-            </li>
-            <li className="nav-item">
-              <a
-                href="/leases"
-                className="nav-links"
-                onClick={(e) => handleNavClick('leaseManager', e)}
-              >
-                All Leases
-              </a>
-            </li>
-            <li className="nav-item">
-              <a
-                href="/rent-roll"
-                className="nav-links"
-                onClick={(e) => handleNavClick('rentRoll', e)}
-              >
-                Income
-              </a>
-            </li>
-            <li className="nav-item">
-              <a
-                href="/financials"
-                className="nav-links"
-                onClick={(e) => handleNavClick('financialDashboard', e)}
-              >
-                Value & Finances
-              </a>
-            </li>
-            <li className="nav-item">
-              <a
-                href="/operations"
-                className="nav-links"
-                onClick={(e) => handleNavClick('operations', e)}
-              >
-                Work & Incidents
-              </a>
-            </li>
-            <li className="nav-item">
-              <a
-                href="/ai-tools"
-                className="nav-links"
-                onClick={(e) => handleNavClick('documentAI', e)}
-              >
-                AI Tools
-              </a>
-            </li>
-            <li className="nav-item">
-              <a
-                href="#reports"
-                className="nav-links"
-                onClick={(e) => handleNavClick('reports', e)}
-              >
-                Reports
-              </a>
-            </li>
-            <li className="nav-item">
-              <a
-                href="#settings"
-                className="nav-links"
-                onClick={(e) => handleNavClick('settings', e)}
-              >
-                Settings
-              </a>
-            </li>
-          </ul>
+      {!authenticated ? (
+        <div className="password-modal-overlay">
+          <div className="password-modal">
+            <h2>Redwood Square Command Center</h2>
+            <p>Enter password to access the dashboard</p>
+            <form onSubmit={handlePasswordSubmit}>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                className="password-input"
+                autoFocus
+              />
+              {passwordError && <p className="password-error">{passwordError}</p>}
+              <button type="submit" className="btn-primary">
+                Access
+              </button>
+            </form>
+          </div>
         </div>
-      </nav>
+      ) : (
+        <>
+          {/* Top Navigation Bar */}
+          <nav className="navbar">
+            <div className="navbar-container">
+              <h1 className="navbar-logo">Redwood Square Command Center</h1>
+              <ul className="nav-menu">
+                <li className="nav-item">
+                  <a
+                    href="#dashboard"
+                    className="nav-links"
+                    onClick={(e) => handleNavClick('dashboard', e)}
+                  >
+                    Home
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <a
+                    href="/leases"
+                    className="nav-links"
+                    onClick={(e) => handleNavClick('leaseManager', e)}
+                  >
+                    All Leases
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <a
+                    href="/rent-roll"
+                    className="nav-links"
+                    onClick={(e) => handleNavClick('rentRoll', e)}
+                  >
+                    Income
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <a
+                    href="/financials"
+                    className="nav-links"
+                    onClick={(e) => handleNavClick('financialDashboard', e)}
+                  >
+                    Value & Finances
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <a
+                    href="/operations"
+                    className="nav-links"
+                    onClick={(e) => handleNavClick('operations', e)}
+                  >
+                    Work & Incidents
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <a
+                    href="/ai-tools"
+                    className="nav-links"
+                    onClick={(e) => handleNavClick('documentAI', e)}
+                  >
+                    AI Tools
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <a
+                    href="#reports"
+                    className="nav-links"
+                    onClick={(e) => handleNavClick('reports', e)}
+                  >
+                    Reports
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <a
+                    href="#settings"
+                    className="nav-links"
+                    onClick={(e) => handleNavClick('settings', e)}
+                  >
+                    Settings
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </nav>
 
-      {renderContent()}
+          {renderContent()}
 
-      {/* Footer */}
-      <footer className="dashboard-footer">
-        <p>Redwood Square Command Center &copy; {new Date().getFullYear()} | Data refreshes every 15 minutes</p>
-      </footer>
+          {/* Footer */}
+          <footer className="dashboard-footer">
+            <p>Redwood Square Command Center &copy; {new Date().getFullYear()} | Data refreshes every 15 minutes</p>
+          </footer>
+        </>
+      )}
     </div>
   );
 }
