@@ -160,24 +160,37 @@ function App() {
                 <>
                   <div className="tenant-list">
                     {confirmedTenants.length > 0 ? (
-                      confirmedTenants.map(tenant => (
-                        <div className="tenant-item" key={tenant.id}>
-                          <strong>{tenant.name}</strong>
-                          <span>{tenant.category}</span>
-                        </div>
-                      ))
+                      <>
+                        {confirmedTenants.slice(0, 4).map(tenant => (
+                          <div className="tenant-item" key={tenant.id}>
+                            <strong>{tenant.name}</strong>
+                            <span>{tenant.category}</span>
+                          </div>
+                        ))}
+                        {confirmedTenants.length > 4 && (
+                          <div className="tenant-item" style={{ justifyContent: 'center', paddingTop: '0.5rem' }}>
+                            <a
+                              href="#"
+                              onClick={(e) => { e.preventDefault(); handleNavClick('leaseManager', e); }}
+                              style={{ color: '#40E0D0', textDecoration: 'none', fontWeight: '600' }}
+                            >
+                              View All ({confirmedTenants.length})
+                            </a>
+                          </div>
+                        )}
+                      </>
                     ) : (
                       <p>No confirmed tenants found.</p>
                     )}
                   </div>
                   {placeholderCount > 0 && (
-                    <p className="placeholder-note" style={{ color: '#9C4A3C', marginTop: '1rem', fontSize: '0.9rem' }}>
+                    <p className="placeholder-note" style={{ color: '#9C4A3C', marginTop: '0.5rem', fontSize: '0.8rem' }}>
                       +{placeholderCount} placeholder units to fill
                     </p>
                   )}
                 </>
               )}
-              <button className="btn-primary">Manage Tenants</button>
+              <button className="btn-primary" style={{ marginTop: '0.5rem' }}>Manage Tenants</button>
             </div>
           </div>
         </div>
