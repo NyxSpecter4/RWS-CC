@@ -4,13 +4,14 @@ import { supabase } from './lib/supabaseClient';
 import LeaseManager from './pages/LeaseManager';
 import RentRoll from './pages/RentRoll';
 import FinancialDashboard from './pages/FinancialDashboard';
+import Operations from './pages/Operations';
 
 function App() {
   const [confirmedTenants, setConfirmedTenants] = useState([]);
   const [placeholderCount, setPlaceholderCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard', 'leaseManager', 'rentRoll', 'financialDashboard'
+  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard', 'leaseManager', 'rentRoll', 'financialDashboard', 'operations'
 
   useEffect(() => {
     async function fetchTenants() {
@@ -61,6 +62,9 @@ function App() {
     }
     if (currentView === 'financialDashboard') {
       return <FinancialDashboard />;
+    }
+    if (currentView === 'operations') {
+      return <Operations />;
     }
 
     // Default dashboard view
@@ -202,6 +206,15 @@ function App() {
                 onClick={(e) => handleNavClick('financialDashboard', e)}
               >
                 Financials
+              </a>
+            </li>
+            <li className="nav-item">
+              <a
+                href="/operations"
+                className="nav-links"
+                onClick={(e) => handleNavClick('operations', e)}
+              >
+                Operations
               </a>
             </li>
           </ul>
