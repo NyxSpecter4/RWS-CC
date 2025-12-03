@@ -6,13 +6,15 @@ import RentRoll from './pages/RentRoll';
 import FinancialDashboard from './pages/FinancialDashboard';
 import Operations from './pages/Operations';
 import DocumentAI from './pages/DocumentAI';
+import Reports from './pages/Reports';
+import Settings from './pages/Settings';
 
 function App() {
   const [confirmedTenants, setConfirmedTenants] = useState([]);
   const [placeholderCount, setPlaceholderCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard', 'leaseManager', 'rentRoll', 'financialDashboard', 'operations', 'documentAI'
+  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard', 'leaseManager', 'rentRoll', 'financialDashboard', 'operations', 'documentAI', 'reports', 'settings'
 
   useEffect(() => {
     async function fetchTenants() {
@@ -69,6 +71,12 @@ function App() {
     }
     if (currentView === 'documentAI') {
       return <DocumentAI />;
+    }
+    if (currentView === 'reports') {
+      return <Reports />;
+    }
+    if (currentView === 'settings') {
+      return <Settings />;
     }
 
     // Default dashboard view
@@ -171,7 +179,7 @@ function App() {
               <a
                 href="#reports"
                 className="nav-links"
-                onClick={(e) => handleNavClick('dashboard', e)}
+                onClick={(e) => handleNavClick('reports', e)}
               >
                 Reports
               </a>
@@ -180,7 +188,7 @@ function App() {
               <a
                 href="#settings"
                 className="nav-links"
-                onClick={(e) => handleNavClick('dashboard', e)}
+                onClick={(e) => handleNavClick('settings', e)}
               >
                 Settings
               </a>
