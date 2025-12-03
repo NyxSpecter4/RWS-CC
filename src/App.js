@@ -48,6 +48,7 @@ function App() {
     fetchTenants();
   }, []);
 
+
   // Total tenant count
   const totalTenants = confirmedTenants.length + placeholderCount;
 
@@ -87,6 +88,31 @@ function App() {
           <h2>Command Center Overview</h2>
           <p>Monitor your property's performance, incidents, and key tenants at a glance.</p>
         </header>
+
+        {/* Quick Start Panel */}
+        <section className="quick-start-panel">
+          <h3>What do you need to do?</h3>
+          <div className="quick-start-buttons">
+            <button
+              className="btn-warning"
+              onClick={(e) => handleNavClick('operations', e)}
+            >
+              Report New Issue
+            </button>
+            <button
+              className="btn-primary"
+              onClick={(e) => handleNavClick('leaseManager', e)}
+            >
+              Add / Review Lease
+            </button>
+            <button
+              className="btn-success"
+              onClick={(e) => handleNavClick('financialDashboard', e)}
+            >
+              Check Property Value
+            </button>
+          </div>
+        </section>
 
         {/* Grid Layout for Cards */}
         <div className="dashboard-grid">
@@ -172,25 +198,7 @@ function App() {
                 className="nav-links"
                 onClick={(e) => handleNavClick('dashboard', e)}
               >
-                Overview
-              </a>
-            </li>
-            <li className="nav-item">
-              <a
-                href="#reports"
-                className="nav-links"
-                onClick={(e) => handleNavClick('reports', e)}
-              >
-                All Reports
-              </a>
-            </li>
-            <li className="nav-item">
-              <a
-                href="#settings"
-                className="nav-links"
-                onClick={(e) => handleNavClick('settings', e)}
-              >
-                Setup
+                Home
               </a>
             </li>
             <li className="nav-item">
@@ -199,7 +207,7 @@ function App() {
                 className="nav-links"
                 onClick={(e) => handleNavClick('leaseManager', e)}
               >
-                Leases
+                All Leases
               </a>
             </li>
             <li className="nav-item">
@@ -208,7 +216,7 @@ function App() {
                 className="nav-links"
                 onClick={(e) => handleNavClick('rentRoll', e)}
               >
-                Rent Report
+                Income
               </a>
             </li>
             <li className="nav-item">
@@ -217,7 +225,7 @@ function App() {
                 className="nav-links"
                 onClick={(e) => handleNavClick('financialDashboard', e)}
               >
-                Property Value
+                Value & Finances
               </a>
             </li>
             <li className="nav-item">
@@ -226,7 +234,7 @@ function App() {
                 className="nav-links"
                 onClick={(e) => handleNavClick('operations', e)}
               >
-                Day-to-Day Ops
+                Work & Incidents
               </a>
             </li>
             <li className="nav-item">
@@ -235,7 +243,25 @@ function App() {
                 className="nav-links"
                 onClick={(e) => handleNavClick('documentAI', e)}
               >
-                Upload Docs (AI)
+                AI Tools
+              </a>
+            </li>
+            <li className="nav-item">
+              <a
+                href="#reports"
+                className="nav-links"
+                onClick={(e) => handleNavClick('reports', e)}
+              >
+                Reports
+              </a>
+            </li>
+            <li className="nav-item">
+              <a
+                href="#settings"
+                className="nav-links"
+                onClick={(e) => handleNavClick('settings', e)}
+              >
+                Settings
               </a>
             </li>
           </ul>

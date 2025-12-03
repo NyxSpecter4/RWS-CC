@@ -5,10 +5,25 @@
   box-sizing: border-box;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+/* Global heading sizes */
+h1, h2, h3 {
+  font-weight: 700;
+  line-height: 1.2;
+}
+h1 {
+  font-size: 4.5rem;
+}
+h2 {
+  font-size: 4rem;
+}
+h3 {
+  font-size: 3.5rem;
+}
 
 body {
   background-color: #f8f9fa;
   color: #333;
+  font-size: 2.5rem;
 }
 
 .App {
@@ -34,8 +49,8 @@ body {
 }
 
 .navbar-logo {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 2rem;
+  font-weight: 800;
   color: #2c3e50;
 }
 
@@ -54,6 +69,7 @@ body {
   color: #555;
   font-weight: 500;
   transition: color 0.3s;
+  font-size: 1.5rem;
 }
 
 .nav-links:hover {
@@ -70,7 +86,8 @@ body {
 }
 
 .dashboard-header h2 {
-  font-size: 2.5rem;
+  font-size: 3rem;
+  font-weight: 800;
   margin-bottom: 0.5rem;
   color: #2c3e50;
 }
@@ -80,6 +97,40 @@ body {
   color: #7f8c8d;
   max-width: 600px;
   margin: 0 auto;
+}
+/* Quick Start Panel */
+.quick-start-panel {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+  width: 100%;
+}
+
+.quick-start-panel h3 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.quick-start-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+.quick-start-buttons button {
+  flex: 1;
+  min-width: 250px;
+  font-size: 2rem;
+  padding: 2rem 3rem;
+  border-radius: 10px;
+  text-align: center;
 }
 
 /* Dashboard Grid */
@@ -120,7 +171,8 @@ body {
 }
 
 .card-header h3 {
-  font-size: 1.5rem;
+  font-size: 2.5rem;
+  font-weight: 700;
   color: #2c3e50;
 }
 
@@ -144,7 +196,7 @@ body {
 }
 
 .valuation-amount {
-  font-size: 2.5rem;
+  font-size: 3.5rem;
   font-weight: 700;
   color: #2c3e50;
   margin: 0.5rem 0;
@@ -190,11 +242,11 @@ body {
 button {
   border: none;
   border-radius: 8px;
-  padding: 0.75rem 1.5rem;
+  padding: 1.5rem 3rem;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s, opacity 0.3s;
-  font-size: 1rem;
+  font-size: 1.5rem;
   align-self: flex-start;
   margin-top: auto;
 }
@@ -230,17 +282,19 @@ button {
 }
 
 .form-group select,
-.form-group input {
+.form-group input,
+.form-group textarea {
   width: 100%;
-  padding: 0.75rem;
+  padding: 1.5rem;
   border: 1px solid #E2E8F0;
   border-radius: 6px;
-  font-size: 1rem;
+  font-size: 1.5rem;
   box-sizing: border-box;
 }
 
 .form-group select:focus,
-.form-group input:focus {
+.form-group input:focus,
+.form-group textarea:focus {
   outline: none;
   border-color: #40E0D0;
   box-shadow: 0 0 0 3px rgba(64, 224, 208, 0.2);
