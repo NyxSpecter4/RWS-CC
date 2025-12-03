@@ -217,6 +217,87 @@ button {
   background-color: #8a3a2c;
 }
 
+/* Form Styles */
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #4A5568;
+}
+
+.form-group select,
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #E2E8F0;
+  border-radius: 6px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.form-group select:focus,
+.form-group input:focus {
+  outline: none;
+  border-color: #40E0D0;
+  box-shadow: 0 0 0 3px rgba(64, 224, 208, 0.2);
+}
+
+.message {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 6px;
+  text-align: center;
+  background-color: #f0fff4;
+  border: 1px solid #9ae6b4;
+  color: #276749;
+}
+
+.message.error {
+  background-color: #fed7d7;
+  border-color: #fc8181;
+  color: #c53030;
+}
+
+/* Rent Roll Table */
+.rent-roll-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+.rent-roll-table thead {
+  background-color: #f1f5f9;
+  border-bottom: 2px solid #40E0D0;
+}
+
+.rent-roll-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #2c3e50;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.rent-roll-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  color: #4a5568;
+}
+
+.rent-roll-table tbody tr:hover {
+  background-color: #f7fafc;
+}
+
+.rent-roll-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
 /* Footer */
 .dashboard-footer {
   text-align: center;
