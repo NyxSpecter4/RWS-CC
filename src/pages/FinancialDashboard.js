@@ -70,6 +70,9 @@ function FinancialDashboard() {
 
       if (error) throw error;
 
+      console.log('Financial data:', data);
+      console.log('Leases data:', data);
+
       // Calculate current rent for each lease and sum
       let total = 0;
       const enrichedLeases = data.map(lease => {
@@ -79,7 +82,17 @@ function FinancialDashboard() {
           lease.start_date
         );
         total += currentRent;
-        return { ...lease, currentRent };
+        console.log('Lease:', lease.id, 'Tenant:', lease.tenants, 'Current rent:', currentRent);
+        // Ensure tenant object exists
+        const tenant = lease.tenants || {};
+        return {
+          ...lease,
+          tenants: {
+            name: tenant.name || 'Unknown Tenant',
+            suite: tenant.suite || 'N/A'
+          },
+          currentRent
+        };
       });
 
       setLeases(enrichedLeases);
@@ -278,8 +291,8 @@ function FinancialDashboard() {
                 onChange={(e) => setSelectedLeaseId(e.target.value)}
                 style={{ width: '100%', padding: '0.75rem', border: '1px solid #E2E8F0', borderRadius: '6px', fontSize: '1rem' }}
               >
-                {leases.map(lease => (
-                  <option key={lease.id} value={lease.id}>
+                {leases.map((lease, index) => (
+                  <option key={`${lease.id}-${lease.tenant_id}-${index}`} value={lease.id}>
                     {lease.tenants?.name || 'Unknown'} – Suite {lease.tenants?.suite || 'N/A'} (Current Rent: {formatCurrency(lease.currentRent)})
                   </option>
                 ))}

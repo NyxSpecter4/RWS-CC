@@ -21,6 +21,8 @@ function App() {
   const [leaseExpirations, setLeaseExpirations] = useState([]);
   const [openItemsCount, setOpenItemsCount] = useState(0);
   const [loadingBrief, setLoadingBrief] = useState(true);
+  const [aiAlerts, setAiAlerts] = useState([]);
+  const [loadingAiAlerts, setLoadingAiAlerts] = useState(true);
 
   const handlePasswordSubmit = (e) => {
     e.preventDefault();
@@ -68,21 +70,55 @@ function App() {
     async function fetchBriefData() {
       try {
         setLoadingBrief(true);
-        // 1. Lease expirations within next 90 days (using updated schema with joins)
+        // 1. Lease expirations within next month (fixed query)
+        const today = new Date().toISOString().split('T')[0];
+        const nextMonth = new Date();
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+        const nextMonthStr = nextMonth.toISOString().split('T')[0];
+
+        // Get leases ONLY - no joins
         const { data: leases, error: leasesError } = await supabase
           .from('leases')
-          .select(`
-            id,
-            end_date,
-            tenants ( name ),
-            units ( suite_number )
-          `)
-          .lt('end_date', new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString())
-          .gt('end_date', new Date().toISOString())
+          .select('id, end_date, tenant_id, unit_id, base_rent, escalation_rate')
+          .lte('end_date', nextMonthStr)
+          .gte('end_date', today)
           .order('end_date', { ascending: true });
 
         if (leasesError) throw leasesError;
-        setLeaseExpirations(leases || []);
+
+        let combinedLeases = [];
+        if (leases && leases.length > 0) {
+          // Get related data separately
+          const tenantIds = [...new Set(leases.map(l => l.tenant_id).filter(Boolean))];
+          const unitIds = [...new Set(leases.map(l => l.unit_id).filter(Boolean))];
+
+          const [tenantsRes, unitsRes] = await Promise.all([
+            tenantIds.length > 0
+              ? supabase.from('tenants').select('id, name, contact_email').in('id', tenantIds)
+              : { data: [], error: null },
+            unitIds.length > 0
+              ? supabase.from('units').select('id, suite_number, square_feet').in('id', unitIds)
+              : { data: [], error: null }
+          ]);
+
+          // Combine everything into shape expected by UI
+          combinedLeases = leases.map(lease => ({
+            id: lease.id,
+            end_date: lease.end_date,
+            base_rent: lease.base_rent || 0,
+            escalation_rate: lease.escalation_rate || 0,
+            tenants: {
+              name: tenantsRes.data?.find(t => t.id === lease.tenant_id)?.name || 'Unknown',
+              contact_email: tenantsRes.data?.find(t => t.id === lease.tenant_id)?.contact_email || ''
+            },
+            units: {
+              suite_number: unitsRes.data?.find(u => u.id === lease.unit_id)?.suite_number || 'N/A',
+              square_feet: unitsRes.data?.find(u => u.id === lease.unit_id)?.square_feet || 0
+            }
+          }));
+        }
+
+        setLeaseExpirations(combinedLeases);
 
         // 2. Open work orders (status != 'completed')
         const { count: workOrdersCount, error: workOrdersError } = await supabase
@@ -102,11 +138,22 @@ function App() {
 
         const totalOpen = (workOrdersCount || 0) + (incidentsCount || 0);
         setOpenItemsCount(totalOpen);
+
+        // 4. Fetch AI alerts (status = 'new')
+        const { data: alerts, error: alertsError } = await supabase
+          .from('ai_alerts')
+          .select('id, alert_type, priority, title, description, status, created_at, entity_type, entity_id, metadata')
+          .eq('status', 'new')
+          .order('created_at', { ascending: false });
+
+        if (alertsError) throw alertsError;
+        setAiAlerts(alerts || []);
       } catch (err) {
         console.error('Error fetching brief data:', err);
         // We can optionally set an error state, but for now just log
       } finally {
         setLoadingBrief(false);
+        setLoadingAiAlerts(false);
       }
     }
 
@@ -120,6 +167,22 @@ function App() {
   const handleNavClick = (view, e) => {
     e.preventDefault();
     setCurrentView(view);
+  };
+
+  const acknowledgeAlert = async (alertId) => {
+    try {
+      const { error } = await supabase
+        .from('ai_alerts')
+        .update({ status: 'acknowledged', updated_at: new Date().toISOString() })
+        .eq('id', alertId);
+
+      if (error) throw error;
+
+      // Remove from local state
+      setAiAlerts(prev => prev.filter(alert => alert.id !== alertId));
+    } catch (err) {
+      console.error('Failed to acknowledge alert:', err);
+    }
   };
 
   const renderContent = () => {
@@ -185,51 +248,31 @@ function App() {
           <div className="brief-content">
             {loadingBrief ? (
               <p>Loading brief...</p>
+            ) : aiAlerts.length === 0 ? (
+              <p className="brief-empty">No new AI alerts.</p>
             ) : (
-              <>
-                <div className="brief-item">
+              aiAlerts.map(alert => (
+                <div className="brief-item" key={alert.id}>
                   <div className="brief-header">
-                    <span className="brief-title">Lease Expirations</span>
-                    <span className="brief-badge">{leaseExpirations.length} within 90 days</span>
+                    <span className="brief-title">{alert.title}</span>
+                    <span className={`brief-badge ${alert.priority}`}>
+                      {alert.priority}
+                    </span>
                   </div>
-                  {leaseExpirations.length > 0 ? (
-                    <ul className="brief-list">
-                      {leaseExpirations.slice(0, 3).map(lease => (
-                        <li key={lease.id}>
-                          <strong>{lease.tenants?.name || 'Unknown'}</strong> – {new Date(lease.end_date).toLocaleDateString()}
-                        </li>
-                      ))}
-                      {leaseExpirations.length > 3 && (
-                        <li className="brief-more">+{leaseExpirations.length - 3} more</li>
-                      )}
-                    </ul>
-                  ) : (
-                    <p className="brief-empty">No leases expiring soon.</p>
-                  )}
-                </div>
-
-                <div className="brief-item">
-                  <div className="brief-header">
-                    <span className="brief-title">Expense Alerts</span>
-                    <span className="brief-badge info">Info</span>
+                  <p className="brief-description">{alert.description}</p>
+                  <div className="brief-footer">
+                    <small>
+                      {alert.alert_type} • {new Date(alert.created_at).toLocaleDateString()}
+                    </small>
+                    <button
+                      className="btn-primary btn-small"
+                      onClick={() => acknowledgeAlert(alert.id)}
+                    >
+                      Acknowledge
+                    </button>
                   </div>
-                  <p className="brief-static">
-                    AI Expense Monitoring Ready – Add expense data to enable.
-                  </p>
                 </div>
-
-                <div className="brief-item">
-                  <div className="brief-header">
-                    <span className="brief-title">Open Items</span>
-                    <span className="brief-badge warning">{openItemsCount} pending</span>
-                  </div>
-                  <p className="brief-static">
-                    {openItemsCount === 0
-                      ? 'All caught up! No open work orders or incidents.'
-                      : `${openItemsCount} open work orders or incidents require attention.`}
-                  </p>
-                </div>
-              </>
+              ))
             )}
           </div>
         </section>

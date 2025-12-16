@@ -20,6 +20,14 @@ function LeaseManager() {
     fetchUnits();
   }, []);
 
+  // Debug selected unit
+  useEffect(() => {
+    if (selectedUnit) {
+      const unitObj = units.find(u => u.id === selectedUnit);
+      console.log('Selected unit:', unitObj);
+    }
+  }, [selectedUnit, units]);
+
   const fetchTenants = async () => {
     const { data, error } = await supabase
       .from('tenants')
@@ -36,7 +44,10 @@ function LeaseManager() {
       .select('id, suite_number, square_feet')
       .order('suite_number');
     if (error) console.error('Error fetching units:', error);
-    else setUnits(data || []);
+    else {
+      console.log('Available units:', data);
+      setUnits(data || []);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -179,6 +190,22 @@ function LeaseManager() {
                 ))}
               </select>
             </div>
+
+            {selectedUnit && (
+              <div className="form-group">
+                <label className="form-label">Unit Square Feet</label>
+                <input
+                  type="number"
+                  value={units.find(u => u.id === selectedUnit)?.square_feet || 0}
+                  readOnly
+                  className="form-control"
+                  placeholder="Auto-filled from selected unit"
+                />
+                <small className="text-muted">
+                  Square footage is automatically pulled from the units table
+                </small>
+              </div>
+            )}
 
             <div className="form-group">
               <label>Start Date</label>
