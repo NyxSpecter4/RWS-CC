@@ -8,6 +8,7 @@ import Operations from './pages/Operations';
 import DocumentAI from './pages/DocumentAI';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
+import RoxyPlanner from './pages/RoxyPlanner';
 
 function App() {
   const [authenticated, setAuthenticated] = useState(false);
@@ -17,7 +18,7 @@ function App() {
   const [placeholderCount, setPlaceholderCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard', 'leaseManager', 'rentRoll', 'financialDashboard', 'operations', 'documentAI', 'reports', 'settings'
+  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard', 'leaseManager', 'rentRoll', 'financialDashboard', 'operations', 'documentAI', 'reports', 'settings', 'roxyPlanner'
   const [leaseExpirations, setLeaseExpirations] = useState([]);
   const [openItemsCount, setOpenItemsCount] = useState(0);
   const [loadingBrief, setLoadingBrief] = useState(true);
@@ -206,6 +207,9 @@ function App() {
     }
     if (currentView === 'settings') {
       return <Settings />;
+    }
+    if (currentView === 'roxyPlanner') {
+      return <RoxyPlanner />;
     }
 
     // Default dashboard view
@@ -453,6 +457,15 @@ function App() {
                     onClick={(e) => handleNavClick('reports', e)}
                   >
                     Reports
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <a
+                    href="#roxy-planner"
+                    className="nav-links"
+                    onClick={(e) => handleNavClick('roxyPlanner', e)}
+                  >
+                    Roxy's Planner
                   </a>
                 </li>
                 <li className="nav-item">
