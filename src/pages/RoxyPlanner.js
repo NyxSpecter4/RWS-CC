@@ -13,6 +13,70 @@ const RoxyPlanner = () => {
   const [thisMonth, setThisMonth] = useState([]);
   const [nextThreeMonths, setNextThreeMonths] = useState([]);
 
+  // Morning audio greeting function
+  const playRoxyGreeting = () => {
+    // Check if speech synthesis is supported
+    if (typeof window === 'undefined' || !window.speechSynthesis) {
+      console.warn('Speech synthesis not supported');
+      return;
+    }
+
+    // Get browser voices
+    const voices = window.speechSynthesis.getVoices();
+    // Find French-accented voice
+    const frenchVoice = voices.find(v => v.lang.includes('fr')) || voices[0];
+    
+    // Check sessionStorage for flag
+    const playedFlag = sessionStorage.getItem('roxysGreetingPlayed');
+    const playedDate = sessionStorage.getItem('roxysGreetingDate');
+    const today = new Date().toDateString();
+    
+    // Check if it's after 8 AM
+    const now = new Date();
+    const hour = now.getHours();
+    if (hour < 8) {
+      return; // Too early
+    }
+    
+    // If already played today, don't play automatically (but allow manual replay)
+    if (playedFlag === 'true' && playedDate === today) {
+      return;
+    }
+    
+    // Determine greeting text based on urgent alerts
+    let greetingText;
+    if (urgent.length > 0) {
+      const firstTitle = urgent[0].title || 'an urgent item';
+      greetingText = `Bonjour. C'est Roxy. You have ${urgent.length} urgent item${urgent.length > 1 ? 's' : ''}. First, ${firstTitle}.`;
+    } else {
+      greetingText = 'Bonjour. C\'est Roxy. Your day is clear.';
+    }
+    
+    // Speak the greeting
+    const utterance = new SpeechSynthesisUtterance(greetingText);
+    if (frenchVoice) {
+      utterance.voice = frenchVoice;
+    }
+    utterance.rate = 0.9;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+    
+    window.speechSynthesis.speak(utterance);
+    
+    // Set sessionStorage flags
+    sessionStorage.setItem('roxysGreetingPlayed', 'true');
+    sessionStorage.setItem('roxysGreetingDate', today);
+  };
+
+  // Trigger greeting on component mount
+  useEffect(() => {
+    // Wait a bit for voices to load
+    const timer = setTimeout(() => {
+      playRoxyGreeting();
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Fetch all alerts from ai_alerts table
   useEffect(() => {
     async function fetchAlerts() {
@@ -158,8 +222,18 @@ const RoxyPlanner = () => {
           <h1>Roxy's Planner – Your Day, Week, & Month Ahead</h1>
           <p>AI‑powered foresight organized by urgency and timeframe.</p>
         </div>
-        <div className="roxy-avatar">
-          <div className="avatar-circle">RX</div>
+        <div className="roxy-header-controls">
+          <button
+            className="speech-button"
+            onClick={playRoxyGreeting}
+            title="Play morning greeting"
+            aria-label="Play morning greeting"
+          >
+            🔊
+          </button>
+          <div className="roxy-avatar">
+            <div className="avatar-circle">RX</div>
+          </div>
         </div>
       </header>
 
