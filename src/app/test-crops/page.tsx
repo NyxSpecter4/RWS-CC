@@ -39,26 +39,16 @@ export default function TestCrops() {
       const res = await fetch('/api/generate-crop-image', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          cropName: crop.name,
-          prompt: crop.prompt 
-        })
+        body: JSON.stringify({ cropName: crop.name, prompt: crop.prompt })
       });
 
-      if (!res.ok) {
-        throw new Error(`API failed: ${res.status}`);
-      }
-
       const data = await res.json();
-      console.log('Response:', data);
-
       if (data.success && data.imageUrl) {
         setImages(prev => ({ ...prev, [crop.id]: data.imageUrl }));
       } else {
-        alert(`Failed to generate ${crop.name}: ${data.error || 'Unknown error'}`);
+        alert(`Failed: ${data.error}`);
       }
     } catch (error: any) {
-      console.error(`Error generating ${crop.name}:`, error);
       alert(`Error: ${error.message}`);
     } finally {
       setLoading(null);
@@ -68,14 +58,12 @@ export default function TestCrops() {
   const generateAllCrops = async () => {
     for (const crop of crops) {
       await generateCropImage(crop);
-      // Wait 2 seconds between requests to avoid rate limits
       await new Promise(resolve => setTimeout(resolve, 2000));
     }
   };
 
   const saveAllImages = () => {
-    const imageData = JSON.stringify(images, null, 2);
-    const blob = new Blob([imageData], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(images, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -84,47 +72,49 @@ export default function TestCrops() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#020103] via-[#1a0b2e] to-[#020103] p-8">
-      <div className="max-w-6xl mx-auto">
-        
-        <h1 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#FFE573] via-[#FD437D] to-[#902F9B] mb-8">
-          🧪 Crop Image Generation Test
+    <div className="h-screen bg-gradient-to-br from-[#020103] via-[#1a0b2e] to-[#020103] p-4 overflow-hidden flex flex-col">
+      
+      {/* HEADER - COMPACT */}
+      <div className="mb-4">
+        <h1 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#FFE573] via-[#FD437D] to-[#902F9B]">
+          �� Crop Image Test
         </h1>
+      </div>
 
-        <div className="bg-yellow-900/40 border-2 border-yellow-500 rounded-xl p-6 mb-8">
-          <p className="text-yellow-300 font-bold text-lg mb-2">⚠️ TEST PAGE</p>
-          <p className="text-white/80">Generate DALL-E 3 images for all crops. Test them here before adding to production!</p>
-        </div>
+      {/* BUTTONS - COMPACT */}
+      <div className="flex gap-3 mb-4">
+        <button
+          onClick={generateAllCrops}
+          disabled={loading !== null}
+          className="px-6 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-bold hover:scale-105 transition-all disabled:opacity-50"
+        >
+          {loading ? '⏳' : '🎨'} Generate All
+        </button>
+        <button
+          onClick={saveAllImages}
+          disabled={Object.keys(images).length === 0}
+          className="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-bold hover:scale-105 transition-all disabled:opacity-50"
+        >
+          💾 Save URLs
+        </button>
+        <a href="/" className="px-6 py-2 bg-gradient-to-r from-[#902F9B] to-[#FD437D] text-white rounded-lg font-bold hover:scale-105 transition-all">
+          🏝️ Home
+        </a>
+      </div>
 
-        <div className="flex gap-4 mb-8">
-          <button
-            onClick={generateAllCrops}
-            disabled={loading !== null}
-            className="px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-bold text-xl hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? '⏳ Generating...' : '🎨 Generate All Crops'}
-          </button>
-
-          <button
-            onClick={saveAllImages}
-            disabled={Object.keys(images).length === 0}
-            className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold text-xl hover:scale-105 transition-all disabled:opacity-50"
-          >
-            💾 Save Image URLs
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* SCROLLABLE CROPS GRID */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 pb-4">
           {crops.map((crop) => (
-            <div key={crop.id} className="bg-white/10 backdrop-blur-md rounded-xl p-6 border-2 border-white/20">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-2xl font-bold text-white">{crop.name}</h3>
+            <div key={crop.id} className="bg-white/10 backdrop-blur-md rounded-lg p-3 border-2 border-white/20">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-lg font-bold text-white">{crop.name}</h3>
                 <button
                   onClick={() => generateCropImage(crop)}
                   disabled={loading === crop.id}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg font-bold hover:bg-purple-700 disabled:opacity-50"
+                  className="px-3 py-1 bg-purple-600 text-white rounded font-bold text-sm hover:bg-purple-700 disabled:opacity-50"
                 >
-                  {loading === crop.id ? '⏳' : '🎨 Generate'}
+                  {loading === crop.id ? '⏳' : '🎨'}
                 </button>
               </div>
 
@@ -133,31 +123,19 @@ export default function TestCrops() {
                   <img 
                     src={images[crop.id]} 
                     alt={crop.name}
-                    className="w-full h-64 object-cover rounded-lg mb-4"
+                    className="w-full h-40 object-cover rounded mb-2"
                   />
-                  <div className="bg-green-900/40 p-3 rounded-lg">
-                    <p className="text-green-400 font-bold mb-2">✅ Generated!</p>
-                    <p className="text-white/60 text-xs break-all">{images[crop.id]}</p>
+                  <div className="bg-green-900/40 p-2 rounded">
+                    <p className="text-green-400 font-bold text-xs">✅ Done!</p>
                   </div>
                 </div>
               ) : (
-                <div className="w-full h-64 bg-gray-800 rounded-lg flex items-center justify-center">
-                  <p className="text-white/40">Not generated yet</p>
+                <div className="w-full h-40 bg-gray-800 rounded flex items-center justify-center">
+                  <p className="text-white/40 text-xs">Not generated</p>
                 </div>
               )}
-
-              <div className="mt-4 bg-blue-900/30 p-3 rounded-lg">
-                <p className="text-blue-400 text-xs mb-2">DALL-E Prompt:</p>
-                <p className="text-white/60 text-xs">{crop.prompt}</p>
-              </div>
             </div>
           ))}
-        </div>
-
-        <div className="mt-8">
-          <a href="/" className="px-6 py-3 bg-gradient-to-r from-[#902F9B] to-[#FD437D] text-white rounded-xl font-bold hover:scale-105 transition-all inline-block">
-            🏝️ Back to Home
-          </a>
         </div>
       </div>
     </div>
