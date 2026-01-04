@@ -1,11 +1,13 @@
 "use client";
 import { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
 
 export default function CelestialAltar() {
   const [currentPhase, setCurrentPhase] = useState<'Hilo' | 'Kū' | 'Akua' | 'Muku'>('Hilo');
   const [goddessImage, setGoddessImage] = useState<string>('');
   const [speech, setSpeech] = useState('Aloha e! I am Leila. Generating my form and analyzing your farm...');
   const [loading, setLoading] = useState(false);
+  const [chatOpen, setChatOpen] = useState(true);
 
   useEffect(() => {
     const day = new Date().getDate();
@@ -67,56 +69,11 @@ export default function CelestialAltar() {
     status: 'Establishment Phase - Planting in Progress',
     currentRevenue: '$0/month',
     crops: [
-      {
-        name: 'Māmaki Tea',
-        emoji: '🌿',
-        allocation: '0.25 acres',
-        plants: '50 plants',
-        status: 'Not yet planted',
-        year1: '$0',
-        year2: '$200/mo',
-        year3: '$500/mo'
-      },
-      {
-        name: 'Finger Limes',
-        emoji: '🍋',
-        allocation: '0.2 acres',
-        plants: '20 trees',
-        status: 'Not yet planted',
-        year1: '$0',
-        year2: '$0',
-        year3: '$300/mo'
-      },
-      {
-        name: 'Vanilla Beans',
-        emoji: '🌺',
-        allocation: '0.2 acres',
-        plants: '60 vines',
-        status: 'Not yet planted',
-        year1: '$0',
-        year2: '$0',
-        year3: '$400/mo'
-      },
-      {
-        name: 'Fresh Ginger',
-        emoji: '🫚',
-        allocation: '0.15 acres',
-        plants: 'Dense bed',
-        status: 'Not yet planted',
-        year1: '$0',
-        year2: '$200/mo',
-        year3: '$300/mo'
-      },
-      {
-        name: 'Turmeric',
-        emoji: '��',
-        allocation: '0.15 acres',
-        plants: 'Dense bed',
-        status: 'Not yet planted',
-        year1: '$0',
-        year2: '$200/mo',
-        year3: '$300/mo'
-      }
+      { name: 'Māmaki Tea', emoji: '🌿', allocation: '0.25 acres', plants: '50 plants', status: 'Not yet planted', year1: '$0', year2: '$200/mo', year3: '$500/mo' },
+      { name: 'Finger Limes', emoji: '🍋', allocation: '0.2 acres', plants: '20 trees', status: 'Not yet planted', year1: '$0', year2: '$0', year3: '$300/mo' },
+      { name: 'Vanilla Beans', emoji: '🌺', allocation: '0.2 acres', plants: '60 vines', status: 'Not yet planted', year1: '$0', year2: '$0', year3: '$400/mo' },
+      { name: 'Fresh Ginger', emoji: '��', allocation: '0.15 acres', plants: 'Dense bed', status: 'Not yet planted', year1: '$0', year2: '$200/mo', year3: '$300/mo' },
+      { name: 'Turmeric', emoji: '🟡', allocation: '0.15 acres', plants: 'Dense bed', status: 'Not yet planted', year1: '$0', year2: '$200/mo', year3: '$300/mo' }
     ]
   };
 
@@ -130,14 +87,10 @@ export default function CelestialAltar() {
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0820] via-[#1a1540] to-[#2d1b4e]"></div>
         
         {[...Array(200)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full bg-white"
+          <div key={i} className="absolute rounded-full bg-white"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 60}%`,
-              width: `${0.5 + Math.random() * 2}px`,
-              height: `${0.5 + Math.random() * 2}px`,
+              left: `${Math.random() * 100}%`, top: `${Math.random() * 60}%`,
+              width: `${0.5 + Math.random() * 2}px`, height: `${0.5 + Math.random() * 2}px`,
               opacity: 0.4 + Math.random() * 0.6,
               animation: `twinkle ${3 + Math.random() * 4}s ease-in-out infinite`
             }}
@@ -150,7 +103,7 @@ export default function CelestialAltar() {
         </svg>
       </div>
 
-      {/* LEILA WITH KAPA PATTERN */}
+      {/* LEILA WITH CLOSEABLE CHAT */}
       <div className="fixed top-4 right-4 md:top-6 md:right-6 z-50">
         <div className="relative">
           <div className="relative w-32 h-32 md:w-44 md:h-44">
@@ -178,7 +131,7 @@ export default function CelestialAltar() {
 
             {goddessImage ? (
               <div className="absolute inset-3 rounded-full overflow-hidden shadow-2xl cursor-pointer hover:scale-105 transition-all"
-                   onClick={generateGoddess}>
+                   onClick={() => setChatOpen(!chatOpen)}>
                 <img src={goddessImage} alt="Leila" className="w-full h-full object-cover" />
               </div>
             ) : (
@@ -195,14 +148,33 @@ export default function CelestialAltar() {
             )}
           </div>
 
-          <div className="absolute top-full right-0 mt-3 w-72 md:w-[28rem] bg-white/98 backdrop-blur-xl rounded-2xl p-4 md:p-5 shadow-2xl border-4 border-[#FFE573]">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-              <span className="text-xs font-black text-purple-700 uppercase">AI LIVE ANALYSIS</span>
+          {/* CLOSEABLE CHAT BUBBLE */}
+          {chatOpen && (
+            <div className="absolute top-full right-0 mt-3 w-72 md:w-[28rem] bg-white/98 backdrop-blur-xl rounded-2xl p-4 md:p-5 shadow-2xl border-4 border-[#FFE573]">
+              <button 
+                onClick={() => setChatOpen(false)}
+                className="absolute top-2 right-2 w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700 transition-all"
+              >
+                <X className="w-4 h-4 text-white" />
+              </button>
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                <span className="text-xs font-black text-purple-700 uppercase">AI LIVE ANALYSIS</span>
+              </div>
+              <p className="text-gray-900 font-semibold text-sm md:text-base leading-relaxed mb-2 pr-6">{speech}</p>
+              <button onClick={getSmartGuidance} className="text-xs text-purple-600 font-bold hover:text-purple-800">↻ Refresh</button>
             </div>
-            <p className="text-gray-900 font-semibold text-sm md:text-base leading-relaxed mb-2">{speech}</p>
-            <button onClick={getSmartGuidance} className="text-xs text-purple-600 font-bold hover:text-purple-800">↻ Refresh</button>
-          </div>
+          )}
+
+          {/* REOPEN BUTTON */}
+          {!chatOpen && (
+            <button
+              onClick={() => setChatOpen(true)}
+              className="absolute top-full right-0 mt-3 px-4 py-2 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-all text-sm"
+            >
+              💬 Open Chat
+            </button>
+          )}
         </div>
       </div>
 
@@ -226,7 +198,7 @@ export default function CelestialAltar() {
         </div>
       </div>
 
-      {/* 5 CROPS - GINGER + TURMERIC */}
+      {/* 5 CROPS */}
       <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/95 to-transparent p-3 md:p-4 backdrop-blur-sm z-40 max-h-[45vh] md:max-h-none overflow-y-auto">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-2 md:mb-3">
@@ -253,9 +225,15 @@ export default function CelestialAltar() {
         </div>
       </div>
 
-      <a href="/debug" className="fixed bottom-3 left-3 md:bottom-4 md:left-4 px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-[#902F9B] to-[#FD437D] text-white rounded-xl font-bold hover:scale-105 transition-all z-50 shadow-2xl text-sm md:text-base">
-        🧠 Dashboard
-      </a>
+      {/* NAVIGATION */}
+      <div className="fixed bottom-3 left-3 md:bottom-4 md:left-4 z-50 flex gap-2">
+        <a href="/dashboard" className="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-[#902F9B] to-[#FD437D] text-white rounded-xl font-bold hover:scale-105 transition-all shadow-2xl text-sm md:text-base">
+          📊 Dashboard
+        </a>
+        <a href="/debug" className="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold hover:scale-105 transition-all shadow-2xl text-sm md:text-base">
+          🔧 Debug
+        </a>
+      </div>
 
       <style jsx>{`
         @keyframes twinkle {
