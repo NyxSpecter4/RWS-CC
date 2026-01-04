@@ -5,10 +5,11 @@ import SmartSensorAlerts from '@/components/SmartSensorAlerts';
 import MarketIntelligence from '@/components/MarketIntelligence';
 import CarbonTracker from '@/components/CarbonTracker';
 import ShamanRecipes from '@/components/ShamanRecipes';
-import { Mountain, Waves, Home } from 'lucide-react';
+import GrantsTracker from '@/components/GrantsTracker';
+import { Mountain, Waves, Home, DollarSign } from 'lucide-react';
 
 export default function Dashboard() {
-  const [activeZone, setActiveZone] = useState<'mauka' | 'waena' | 'makai'>('mauka');
+  const [activeZone, setActiveZone] = useState<'mauka' | 'waena' | 'makai' | 'grants'>('mauka');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#020103] via-[#1a0b2e] to-[#020103] p-2 sm:p-4 pb-20">
@@ -40,11 +41,12 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-3 sm:mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mb-3 sm:mb-6">
           {[
             { id: 'mauka', icon: Mountain, label: '⛰️ Mauka', color: 'green' },
             { id: 'waena', icon: Home, label: '🏞️ Waena', color: 'purple' },
-            { id: 'makai', icon: Waves, label: '🌊 Makai', color: 'blue' }
+            { id: 'makai', icon: Waves, label: '🌊 Makai', color: 'blue' },
+            { id: 'grants', icon: DollarSign, label: '💰 Grants', color: 'yellow' }
           ].map((zone) => {
             const Icon = zone.icon;
             const isActive = activeZone === zone.id;
@@ -75,6 +77,8 @@ export default function Dashboard() {
           {activeZone === 'waena' && <ShamanRecipes />}
           
           {activeZone === 'makai' && <MarketIntelligence />}
+          
+          {activeZone === 'grants' && <GrantsTracker />}
         </div>
 
         <div className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur p-2 sm:relative sm:bg-transparent sm:mt-6 sm:p-0">
