@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import SoilHealthTracker from '@/components/SoilHealthTracker';
+import SmartSensorAlerts from '@/components/SmartSensorAlerts';
 import ExpertPanel from '@/components/ExpertPanel';
 import { Brain } from 'lucide-react';
 
@@ -66,3 +67,9 @@ export default function UltimateDebugDashboard() {
       </div>
 
       <SoilHealthTracker />
+
+      {/* SMART SENSOR ALERTS */}
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-cyan-400 mb-4">📡 AgTech IoT - Smart Sensor Intelligence</h2>
+        <SmartSensorAlerts />
+      </div>
