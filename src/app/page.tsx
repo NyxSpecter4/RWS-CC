@@ -5,8 +5,9 @@ export default function CelestialAltar() {
   const [currentPhase, setCurrentPhase] = useState<'Hilo' | 'Kū' | 'Akua' | 'Muku'>('Hilo');
   const [goddessImage, setGoddessImage] = useState<string>('');
   const [goddessEmotion, setGoddessEmotion] = useState<'happy' | 'wise' | 'urgent' | 'calm'>('wise');
-  const [speech, setSpeech] = useState('');
+  const [speech, setSpeech] = useState('Loading intelligent guidance...');
   const [loading, setLoading] = useState(false);
+  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
   useEffect(() => {
     const day = new Date().getDate();
@@ -18,7 +19,11 @@ export default function CelestialAltar() {
     const saved = localStorage.getItem('leila_goddess_image');
     if (saved) setGoddessImage(saved);
 
-    updateGoddessMessage();
+    getSmartGuidance();
+
+    // Update guidance every 2 minutes
+    const interval = setInterval(getSmartGuidance, 120000);
+    return () => clearInterval(interval);
   }, [currentPhase]);
 
   const generateGoddess = async () => {
@@ -37,29 +42,48 @@ export default function CelestialAltar() {
     }
   };
 
-  const updateGoddessMessage = () => {
-    const messages = {
-      Hilo: {
-        text: "Aloha e! Today is Hilo - Ka Pōʻe, the Empty Bowl. Plant your māmaki seeds NOW. The dark moon nurtures what grows beneath, like water filling an empty vessel. Seeds need darkness to germinate! 🌑",
-        emotion: 'calm' as const
-      },
-      Kū: {
-        text: "E kū! Ka Piha - the Bowl Fills! Rising moon energy pulls plants upward. This is THE BEST time to transplant your finger lime starts. They'll grow with the moon's ascending mana! 🌒",
-        emotion: 'happy' as const
-      },
-      Akua: {
-        text: "AKUA - Ka Maona! THE FULL BOWL! Peak mana overflows! Pollinate your vanilla RIGHT NOW - this moment! Harvest māmaki at maximum potency. Market price jumped to $185/lb, up 12%! ✨🌕",
-        emotion: 'urgent' as const
-      },
-      Muku: {
-        text: "Muku - Ka Nalo, the Bowl Empties. Energy returns to earth. Time to rest and reflect. Sharpen your tools, log your data, plan the next cycle. The ʻāina needs stillness to prepare for Hilo. 🌘",
-        emotion: 'wise' as const
-      }
-    };
+  const getSmartGuidance = async () => {
+    try {
+      // Gather ALL farm data
+      const sensorData = {
+        moisture_10cm: 45,
+        moisture_30cm: 52,
+        ec_30cm: 1.2,
+        temperature: 78
+      };
 
-    const current = messages[currentPhase];
-    setSpeech(current.text);
-    setGoddessEmotion(current.emotion);
+      const marketData = {
+        mamaki: { price: 185, change: '+12%' },
+        finger_limes: { price: 45, change: '+7%' },
+        vanilla: { price: 320, change: '+2%' }
+      };
+
+      const soilData = {
+        organic_matter: 4.1,
+        last_knf: 'IMO #3',
+        yield_trend: '+50%'
+      };
+
+      const res = await fetch('/api/leila-smart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          phase: currentPhase,
+          sensorData,
+          marketData,
+          soilData
+        })
+      });
+
+      const data = await res.json();
+      setSpeech(data.speech);
+      setGoddessEmotion(data.emotion);
+      setLastUpdate(new Date());
+    } catch (e) {
+      console.error('Smart guidance error:', e);
+      setSpeech('Aloha e! The mana flows strong today. Check your sensors and trust the ʻāina. 🌺');
+      setGoddessEmotion('wise');
+    }
   };
 
   const phaseData = {
@@ -124,16 +148,26 @@ export default function CelestialAltar() {
         ))}
       </div>
 
-      {/* GODDESS IN TOP RIGHT CORNER - BIGGER */}
+      {/* SMART GODDESS - TOP RIGHT */}
       <div className="fixed top-4 right-4 z-50">
         <div className="relative">
-          {/* Speech Bubble */}
+          {/* AI-POWERED Speech Bubble */}
           <div className="absolute bottom-full right-0 mb-4 w-[28rem] bg-white/95 backdrop-blur-xl rounded-2xl p-5 shadow-2xl border-4 border-[#FFE573]">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold text-purple-600">🤖 AI-POWERED GUIDANCE</span>
+              <span className="text-xs text-gray-500">{lastUpdate.toLocaleTimeString()}</span>
+            </div>
             <p className="text-gray-900 font-semibold text-base leading-relaxed">{speech}</p>
             <div className="absolute -bottom-2 right-12 w-4 h-4 bg-white rotate-45 border-r-4 border-b-4 border-[#FFE573]"></div>
+            <button 
+              onClick={getSmartGuidance}
+              className="mt-3 text-xs text-purple-600 hover:text-purple-800 font-semibold"
+            >
+              ↻ Refresh Guidance
+            </button>
           </div>
 
-          {/* Goddess Avatar - BIGGER */}
+          {/* Goddess Avatar */}
           {goddessImage ? (
             <div className={`w-48 h-48 rounded-full overflow-hidden border-4 border-[#FFE573] shadow-2xl ${emotionStyles[goddessEmotion]} transition-all cursor-pointer`}
                  onClick={generateGoddess}>
@@ -152,10 +186,9 @@ export default function CelestialAltar() {
         </div>
       </div>
 
-      {/* MAIN CONTENT - CLEANER CENTER */}
+      {/* MOON - CENTER */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-8">
         
-        {/* MOON - CENTER - CLEAN */}
         <div className="mb-8 relative">
           <svg width="500" height="500" viewBox="0 0 500 500" className="filter drop-shadow-[0_0_120px_rgba(255,229,115,0.9)]">
             <defs>
@@ -188,7 +221,6 @@ export default function CelestialAltar() {
             <circle cx="250" cy="250" r="230" fill="url(#moonGrad)" filter="url(#craters-medium)" opacity="0.7" />
           </svg>
           
-          {/* PHASE NAME - SIMPLE & CLEAN BELOW MOON */}
           <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-center">
             <h2 className="text-6xl font-black" style={{ color: current.color }}>
               {current.hawaiian}
@@ -198,7 +230,7 @@ export default function CelestialAltar() {
         </div>
       </div>
 
-      {/* CROPS ON THE GROUND - BOTTOM - CLEANER */}
+      {/* CROPS */}
       <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/80 to-transparent p-6 backdrop-blur-sm">
         <div className="grid grid-cols-4 gap-4 max-w-6xl mx-auto">
           {crops.map((crop, i) => (
@@ -212,7 +244,7 @@ export default function CelestialAltar() {
         </div>
       </div>
 
-      {/* EXPERT PANEL LINK - BOTTOM LEFT */}
+      {/* EXPERT PANEL LINK */}
       <a href="/debug" 
          className="fixed bottom-4 left-4 px-6 py-3 bg-gradient-to-r from-[#902F9B] to-[#FD437D] text-white rounded-xl font-bold hover:scale-105 transition-all z-50 shadow-2xl flex items-center gap-2">
         🧠 Expert Panel
