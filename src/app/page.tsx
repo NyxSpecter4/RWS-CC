@@ -70,46 +70,52 @@ export default function CelestialAltar() {
       {
         name: 'Māmaki Tea',
         emoji: '🌿',
-        allocation: '0.3 acres',
-        plants: '60 plants',
+        allocation: '0.25 acres',
+        plants: '50 plants',
         status: 'Not yet planted',
         year1: '$0',
         year2: '$200/mo',
-        year3: '$500/mo',
-        maturity: '18-24 months to first harvest'
+        year3: '$500/mo'
       },
       {
         name: 'Finger Limes',
         emoji: '🍋',
-        allocation: '0.25 acres',
-        plants: '25 trees',
+        allocation: '0.2 acres',
+        plants: '20 trees',
         status: 'Not yet planted',
         year1: '$0',
         year2: '$0',
-        year3: '$300/mo',
-        maturity: '3-4 years to production (seasonal)'
+        year3: '$300/mo'
       },
       {
         name: 'Vanilla Beans',
         emoji: '🌺',
-        allocation: '0.25 acres',
-        plants: '80 vines',
+        allocation: '0.2 acres',
+        plants: '60 vines',
         status: 'Not yet planted',
         year1: '$0',
         year2: '$0',
-        year3: '$400/mo',
-        maturity: '3 years minimum, hand-pollinated, 6mo cure'
+        year3: '$400/mo'
       },
       {
-        name: 'Turmeric',
-        emoji: '🟡',
-        allocation: '0.2 acres',
+        name: 'Fresh Ginger',
+        emoji: '🫚',
+        allocation: '0.15 acres',
         plants: 'Dense bed',
         status: 'Not yet planted',
         year1: '$0',
-        year2: '$250/mo',
-        year3: '$400/mo',
-        maturity: '8-10 months to first harvest'
+        year2: '$200/mo',
+        year3: '$300/mo'
+      },
+      {
+        name: 'Turmeric',
+        emoji: '��',
+        allocation: '0.15 acres',
+        plants: 'Dense bed',
+        status: 'Not yet planted',
+        year1: '$0',
+        year2: '$200/mo',
+        year3: '$300/mo'
       }
     ]
   };
@@ -144,11 +150,10 @@ export default function CelestialAltar() {
         </svg>
       </div>
 
-      {/* LEILA WITH KAPA PATTERN - RESPONSIVE */}
+      {/* LEILA WITH KAPA PATTERN */}
       <div className="fixed top-4 right-4 md:top-6 md:right-6 z-50">
         <div className="relative">
           <div className="relative w-32 h-32 md:w-44 md:h-44">
-            {/* KAPA PATTERN BORDER */}
             <svg className="absolute inset-0 w-full h-full" viewBox="0 0 176 176">
               <defs>
                 <linearGradient id="kapaGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -221,8 +226,8 @@ export default function CelestialAltar() {
         </div>
       </div>
 
-      {/* FARM PLAN WITH TURMERIC */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/95 to-transparent p-3 md:p-4 backdrop-blur-sm z-40 max-h-[40vh] md:max-h-none overflow-y-auto">
+      {/* 5 CROPS - GINGER + TURMERIC */}
+      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/95 to-transparent p-3 md:p-4 backdrop-blur-sm z-40 max-h-[45vh] md:max-h-none overflow-y-auto">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-2 md:mb-3">
             <p className="text-white font-bold text-sm md:text-lg">🌱 1-Acre Regenerative Farm Plan</p>
@@ -230,14 +235,14 @@ export default function CelestialAltar() {
             <p className="text-white/60 text-xs">{farmPlan.status}</p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mb-16 md:mb-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 md:gap-3 mb-16 md:mb-4">
             {farmPlan.crops.map((crop) => (
               <div key={crop.name} className="bg-white/10 backdrop-blur-md rounded-lg md:rounded-xl p-2 md:p-3 border-2 border-white/20">
-                <div className="text-3xl md:text-4xl mb-1 md:mb-2 text-center">{crop.emoji}</div>
-                <h4 className="font-bold text-white text-center text-xs md:text-sm mb-1">{crop.name}</h4>
-                <p className="text-xs text-white/60 text-center mb-1">{crop.allocation}</p>
-                <p className="text-xs text-orange-400 font-bold text-center mb-1">{crop.status}</p>
-                <div className="text-[10px] md:text-xs text-white/50 text-center space-y-0.5">
+                <div className="text-2xl md:text-3xl mb-1 text-center">{crop.emoji}</div>
+                <h4 className="font-bold text-white text-center text-[10px] md:text-xs mb-1">{crop.name}</h4>
+                <p className="text-[9px] md:text-xs text-white/60 text-center mb-1">{crop.allocation}</p>
+                <p className="text-[9px] md:text-xs text-orange-400 font-bold text-center mb-1">{crop.status}</p>
+                <div className="text-[8px] md:text-[10px] text-white/50 text-center space-y-0.5">
                   <p>Y1: {crop.year1}</p>
                   <p>Y2: {crop.year2}</p>
                   <p>Y3+: {crop.year3}</p>
