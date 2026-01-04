@@ -40,19 +40,19 @@ export default function CelestialAltar() {
   const updateGoddessMessage = () => {
     const messages = {
       Hilo: {
-        text: "Aloha e! Today is Hilo - Ka Pōʻe, the Empty Bowl. Plant your māmaki seeds NOW. The dark moon nurtures what grows beneath, like water filling an empty vessel. 🌑",
+        text: "Aloha e! Today is Hilo - Ka Pōʻe, the Empty Bowl. Plant your māmaki seeds NOW. The dark moon nurtures what grows beneath, like water filling an empty vessel. Seeds need darkness to germinate! 🌑",
         emotion: 'calm' as const
       },
       Kū: {
-        text: "E kū! The Bowl Fills - rising energy! This is when we transplant starts. They grow UPWARD with the moon's ascending mana. Move those finger limes! 🌒",
+        text: "E kū! Ka Piha - the Bowl Fills! Rising moon energy pulls plants upward. This is THE BEST time to transplant your finger lime starts. They'll grow with the moon's ascending mana! 🌒",
         emotion: 'happy' as const
       },
       Akua: {
-        text: "AKUA - Ka Maona! THE FULL BOWL! Peak mana overflows! Pollinate vanilla NOW! Harvest māmaki at maximum potency! Market: $185/lb, up 12%! ✨🌕",
+        text: "AKUA - Ka Maona! THE FULL BOWL! Peak mana overflows! Pollinate your vanilla RIGHT NOW - this moment! Harvest māmaki at maximum potency. Market price jumped to $185/lb, up 12%! ✨🌕",
         emotion: 'urgent' as const
       },
       Muku: {
-        text: "Muku - the Bowl Empties. Time to rest and reflect. Sharpen tools, log data, plan next cycle. The ʻāina needs stillness to prepare for Hilo again. 🌘",
+        text: "Muku - Ka Nalo, the Bowl Empties. Energy returns to earth. Time to rest and reflect. Sharpen your tools, log your data, plan the next cycle. The ʻāina needs stillness to prepare for Hilo. 🌘",
         emotion: 'wise' as const
       }
     };
@@ -62,37 +62,28 @@ export default function CelestialAltar() {
     setGoddessEmotion(current.emotion);
   };
 
-  // KĀWIKA'S BOWL METAPHOR - IMPLEMENTED
   const phaseData = {
     Hilo: { 
       hawaiian: 'Hilo', 
       metaphor: 'Ka Pōʻe (The Empty Bowl)',
-      why: 'Seeds need darkness to germinate, like water settling in an empty vessel',
-      action: 'Plant seeds, inoculate mushrooms',
       color: '#8B7355',
       bgGradient: 'from-gray-900 to-purple-900'
     },
     Kū: { 
       hawaiian: 'Kū', 
       metaphor: 'Ka Piha (The Filling Bowl)',
-      why: 'Rising moon energy pulls plants upward, like water rising',
-      action: 'Transplant starts - they grow with the moon',
       color: '#902F9B',
       bgGradient: 'from-purple-900 to-pink-900'
     },
     Akua: { 
       hawaiian: 'Akua', 
       metaphor: 'Ka Maona (The Full Bowl)',
-      why: 'Maximum mana! Peak nutrients, peak pollination, peak harvest power',
-      action: 'Pollinate Vanilla, Harvest Māmaki',
       color: '#FFE573',
       bgGradient: 'from-yellow-600 to-orange-600'
     },
     Muku: { 
       hawaiian: 'Muku', 
       metaphor: 'Ka Nalo (The Draining Bowl)',
-      why: 'Energy returns to earth. Time for rest, reflection, tool maintenance',
-      action: 'Rest, sharpen tools, log data',
       color: '#6B21A8',
       bgGradient: 'from-purple-900 to-gray-900'
     }
@@ -133,16 +124,16 @@ export default function CelestialAltar() {
         ))}
       </div>
 
-      {/* GODDESS IN TOP RIGHT CORNER */}
+      {/* GODDESS IN TOP RIGHT CORNER - BIGGER */}
       <div className="fixed top-4 right-4 z-50">
         <div className="relative">
           {/* Speech Bubble */}
-          <div className="absolute bottom-full right-0 mb-4 w-[28rem] bg-white/95 backdrop-blur-xl rounded-2xl p-4 shadow-2xl border-4 border-[#FFE573]">
-            <p className="text-gray-900 font-semibold text-lg">{speech}</p>
-            <div className="absolute -bottom-2 right-8 w-4 h-4 bg-white rotate-45 border-r-4 border-b-4 border-[#FFE573]"></div>
+          <div className="absolute bottom-full right-0 mb-4 w-[28rem] bg-white/95 backdrop-blur-xl rounded-2xl p-5 shadow-2xl border-4 border-[#FFE573]">
+            <p className="text-gray-900 font-semibold text-base leading-relaxed">{speech}</p>
+            <div className="absolute -bottom-2 right-12 w-4 h-4 bg-white rotate-45 border-r-4 border-b-4 border-[#FFE573]"></div>
           </div>
 
-          {/* Goddess Avatar */}
+          {/* Goddess Avatar - BIGGER */}
           {goddessImage ? (
             <div className={`w-48 h-48 rounded-full overflow-hidden border-4 border-[#FFE573] shadow-2xl ${emotionStyles[goddessEmotion]} transition-all cursor-pointer`}
                  onClick={generateGoddess}>
@@ -152,20 +143,20 @@ export default function CelestialAltar() {
             <div className="w-48 h-48 rounded-full bg-gradient-to-br from-[#902F9B] to-[#FD437D] flex items-center justify-center border-4 border-[#FFE573] cursor-pointer"
                  onClick={generateGoddess}>
               {loading ? (
-                <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
               ) : (
-                <span className="text-white text-xs">Generate</span>
+                <span className="text-white font-bold">Generate</span>
               )}
             </div>
           )}
         </div>
       </div>
 
-      {/* MAIN CONTENT */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-8 pt-40">
+      {/* MAIN CONTENT - CLEANER CENTER */}
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-8">
         
-        {/* MOON - CENTER - NO EMOJI! */}
-        <div className="mb-12 relative">
+        {/* MOON - CENTER - CLEAN */}
+        <div className="mb-8 relative">
           <svg width="500" height="500" viewBox="0 0 500 500" className="filter drop-shadow-[0_0_120px_rgba(255,229,115,0.9)]">
             <defs>
               <filter id="craters-deep">
@@ -197,43 +188,33 @@ export default function CelestialAltar() {
             <circle cx="250" cy="250" r="230" fill="url(#moonGrad)" filter="url(#craters-medium)" opacity="0.7" />
           </svg>
           
-          {/* KĀWIKA'S BOWL METAPHOR - BELOW MOON */}
-          <div className="absolute -bottom-32 left-1/2 transform -translate-x-1/2 w-full text-center">
-            <h2 className="text-6xl font-black mb-2" style={{ color: current.color }}>
+          {/* PHASE NAME - SIMPLE & CLEAN BELOW MOON */}
+          <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-center">
+            <h2 className="text-6xl font-black" style={{ color: current.color }}>
               {current.hawaiian}
             </h2>
-            <p className="text-3xl font-bold text-white/90 mb-3">{current.metaphor}</p>
-            <p className="text-white/70 text-lg max-w-xl mx-auto italic">
-              "{current.why}"
-            </p>
+            <p className="text-xl font-bold text-white/70 mt-1">{current.metaphor}</p>
           </div>
-        </div>
-
-        {/* ACTION GUIDANCE */}
-        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border-2 border-white/30 mb-8 max-w-2xl mt-32">
-          <h3 className="text-2xl font-bold text-[#FFE573] mb-4">Today's Action</h3>
-          <p className="text-white text-xl font-semibold">{current.action}</p>
         </div>
       </div>
 
-      {/* CROPS ON THE GROUND - BOTTOM */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 to-transparent p-8 backdrop-blur-sm">
-        <h3 className="text-2xl font-bold text-[#FFE573] mb-4 text-center">🌱 Your Farm • Market Prices</h3>
-        <div className="grid grid-cols-4 gap-4">
+      {/* CROPS ON THE GROUND - BOTTOM - CLEANER */}
+      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/80 to-transparent p-6 backdrop-blur-sm">
+        <div className="grid grid-cols-4 gap-4 max-w-6xl mx-auto">
           {crops.map((crop, i) => (
             <div key={i} className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 hover:scale-105 transition-all">
               <div className="text-4xl mb-2 text-center">{crop.emoji}</div>
               <h4 className="font-bold text-white text-center mb-1">{crop.name}</h4>
-              <p className="text-center font-bold text-xl mb-2" style={{ color: crop.color }}>{crop.price}</p>
-              <p className="text-xs text-white/60 text-center">{crop.status}</p>
+              <p className="text-center font-bold text-xl mb-1" style={{ color: crop.color }}>{crop.price}</p>
+              <p className="text-xs text-white/50 text-center">{crop.status}</p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* DEBUG LINK */}
+      {/* EXPERT PANEL LINK - BOTTOM LEFT */}
       <a href="/debug" 
-         className="fixed bottom-4 left-4 px-6 py-3 bg-gradient-to-r from-[#902F9B] to-[#FD437D] text-white rounded-xl font-bold hover:scale-105 transition-all z-50 shadow-2xl">
+         className="fixed bottom-4 left-4 px-6 py-3 bg-gradient-to-r from-[#902F9B] to-[#FD437D] text-white rounded-xl font-bold hover:scale-105 transition-all z-50 shadow-2xl flex items-center gap-2">
         🧠 Expert Panel
       </a>
 
