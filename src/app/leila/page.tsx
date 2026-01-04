@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import LeilaAvatar from '@/components/LeilaAvatar';
+import LeilaGoddess from '@/components/LeilaGoddess';
 
 type Message = {
   id: string;
@@ -104,7 +104,7 @@ export default function LeilaChat() {
         {/* Header */}
         <div className="flex flex-col md:flex-row items-center justify-between mb-8 p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
           <div className="flex items-center gap-4 mb-4 md:mb-0">
-            <LeilaAvatar isSpeaking={isLoading} size="md" pulseColor="from-[#FFE573]/40 via-[#FD437D]/30 to-[#902F9B]/40" />
+            <LeilaGoddess isSpeaking={isLoading} size="md" pulseColor="from-[#FFE573]/40 via-[#FD437D]/30 to-[#902F9B]/40" />
             <div>
               <h1 className="text-3xl font-bold text-white">Leila</h1>
               <p className="text-white/80">Guardian of the \'Āina • Hawaiian Goddess of Growth</p>

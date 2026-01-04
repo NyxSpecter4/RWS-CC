@@ -17,3 +17,12 @@
 .crater-filter {
   filter: url(#craterShader);
 }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); opacity: 0.6; }
+  50% { transform: translateY(-20px); opacity: 1; }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
