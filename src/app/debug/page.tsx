@@ -17,6 +17,7 @@ export default function DebugPage() {
   const [showNotes, setShowNotes] = useState(false);
   const [pendingRating, setPendingRating] = useState<'up' | 'down' | null>(null);
   const [improvedPrompt, setImprovedPrompt] = useState('');
+  const [generateStatus, setGenerateStatus] = useState('');
 
   useEffect(() => {
     if (localStorage.getItem('debug_auth') === 'CB') {
@@ -43,29 +44,50 @@ export default function DebugPage() {
   };
 
   const generate = async () => {
+    console.log('🎨 Starting generation...');
     setLoading(true);
+    setGenerateStatus('Generating Leila...');
+    
     try {
-      // If we have an improved prompt, use it
       const endpoint = improvedPrompt 
         ? '/api/generate-leila-smart'
         : '/api/generate-goddess';
+      
+      console.log('📡 Calling API:', endpoint);
+      setGenerateStatus(improvedPrompt ? 'Using AI-improved prompt...' : 'Creating new Leila...');
       
       const res = await fetch(endpoint, { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           improvedPrompt: improvedPrompt || undefined,
-          previousRatings: ratings.slice(-5) // Send last 5 ratings for context
+          previousRatings: ratings.slice(-5)
         })
       });
       
+      console.log('📥 Response status:', res.status);
       const data = await res.json();
-      if (data.success) {
+      console.log('📦 Response data:', data);
+      
+      if (data.success && data.imageUrl) {
         setLeilaImg(data.imageUrl);
+        setGenerateStatus('✅ Leila created!');
+        console.log('✅ Image loaded:', data.imageUrl);
+        
         if (data.promptUsed) {
           setImprovedPrompt(data.promptUsed);
         }
+        
+        setTimeout(() => setGenerateStatus(''), 2000);
+      } else {
+        setGenerateStatus('❌ Generation failed');
+        console.error('Failed:', data);
+        alert('Generation failed: ' + (data.error || 'Unknown error'));
       }
+    } catch (err) {
+      console.error('❌ Error:', err);
+      setGenerateStatus('❌ Error occurred');
+      alert('Error generating: ' + err);
     } finally {
       setLoading(false);
     }
@@ -89,13 +111,14 @@ export default function DebugPage() {
     const updated = [...ratings, newRating];
     setRatings(updated);
     localStorage.setItem('leila_ratings', JSON.stringify(updated));
+    
+    console.log('💾 Saved to localStorage:', newRating);
 
-    // If user provided notes, analyze and improve the prompt
     if (notes.trim()) {
       await analyzeAndImprovePrompt(updated);
     }
 
-    alert(pendingRating === 'up' ? '👍 Saved! AI learning your preferences...' : '👎 Saved! AI will avoid this style...');
+    alert(pendingRating === 'up' ? '👍 Saved to localStorage!' : '👎 Saved to localStorage!');
     
     setNotes('');
     setShowNotes(false);
@@ -104,6 +127,7 @@ export default function DebugPage() {
 
   const analyzeAndImprovePrompt = async (allRatings: any[]) => {
     try {
+      console.log('🧠 Analyzing feedback...');
       const res = await fetch('/api/analyze-leila-feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -113,10 +137,10 @@ export default function DebugPage() {
       const data = await res.json();
       if (data.success && data.improvedPrompt) {
         setImprovedPrompt(data.improvedPrompt);
-        console.log('✨ Prompt improved based on your feedback!');
+        console.log('✨ Prompt improved!');
       }
     } catch (error) {
-      console.error('Error analyzing feedback:', error);
+      console.error('Error analyzing:', error);
     }
   };
 
@@ -162,6 +186,11 @@ export default function DebugPage() {
           </div>
         </div>
 
+        <div className="bg-blue-900/40 border-2 border-blue-500/40 rounded-xl p-4 mb-6">
+          <p className="text-blue-400 font-bold mb-2">💾 Storage: localStorage (Browser Only)</p>
+          <p className="text-white/80 text-sm">Images saved to your browser. Not in database yet. Total: {ratings.length} ratings</p>
+        </div>
+
         <div className="bg-purple-900/40 rounded-2xl p-6 mb-6 border-2 border-purple-500/40">
           <div className="flex items-center gap-3 mb-4">
             <h2 className="text-2xl font-bold text-purple-400">👑 Leila Tester</h2>
@@ -177,21 +206,27 @@ export default function DebugPage() {
             <div>
               <div className="bg-white/10 rounded-xl p-4 mb-4">
                 {leilaImg ? (
-                  <img src={leilaImg} className="w-full h-80 object-cover rounded-lg" />
+                  <img src={leilaImg} className="w-full h-80 object-cover rounded-lg" alt="Leila" />
                 ) : (
                   <div className="w-full h-80 bg-gray-800 rounded-lg flex items-center justify-center">
-                    <p className="text-white/40">Click Generate</p>
+                    <p className="text-white/40 text-center px-4">Click Generate Button Below ⬇️</p>
                   </div>
                 )}
               </div>
               
+              {generateStatus && (
+                <div className="bg-blue-900/40 p-3 rounded-lg mb-3 text-center border-2 border-blue-500/40">
+                  <p className="text-blue-400 font-bold text-lg">{generateStatus}</p>
+                </div>
+              )}
+              
               <button
                 onClick={generate}
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-xl font-bold mb-3 flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-xl font-bold mb-3 flex items-center justify-center gap-2 hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed text-lg shadow-lg"
               >
-                <RefreshCw className={loading ? 'animate-spin' : ''} />
-                {loading ? 'Generating...' : improvedPrompt ? 'Generate (AI Improved)' : 'Generate New'}
+                <RefreshCw className={`w-6 h-6 ${loading ? 'animate-spin' : ''}`} />
+                {loading ? '⏳ Generating...' : improvedPrompt ? '🎨 Generate (AI Improved)' : '�� Generate New Leila'}
               </button>
               
               {leilaImg && !showNotes && (
@@ -227,7 +262,7 @@ export default function DebugPage() {
                       onClick={submitRating}
                       className="flex-1 bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700"
                     >
-                      ✅ Submit & Learn
+                      ✅ Save to localStorage
                     </button>
                     <button
                       onClick={() => {
@@ -251,7 +286,7 @@ export default function DebugPage() {
               <h3 className="text-xl font-bold text-white mb-4">📊 Ratings & Notes</h3>
               <div className="space-y-2 max-h-80 overflow-y-auto mb-4">
                 {ratings.length === 0 ? (
-                  <p className="text-white/60">No ratings yet</p>
+                  <p className="text-white/60">No ratings yet. Generate and rate Leilas!</p>
                 ) : (
                   ratings.slice().reverse().map((r, i) => (
                     <div key={i} className="bg-white/5 p-3 rounded">
@@ -291,10 +326,10 @@ export default function DebugPage() {
         <div className="bg-white/10 p-6 rounded-xl">
           <h3 className="text-2xl font-bold text-white mb-4">🧪 Test Tools</h3>
           <div className="grid grid-cols-4 gap-4">
-            <a href="/test-crops" className="bg-green-600 text-white py-4 rounded-xl font-bold text-center">🌱 Crops</a>
-            <a href="/choose-leila" className="bg-purple-600 text-white py-4 rounded-xl font-bold text-center">👑 Choose</a>
-            <a href="/api/test-connection" className="bg-yellow-600 text-white py-4 rounded-xl font-bold text-center">🔌 APIs</a>
-            <a href="/dashboard" className="bg-blue-600 text-white py-4 rounded-xl font-bold text-center">📊 Dashboard</a>
+            <a href="/test-crops" className="bg-green-600 text-white py-4 rounded-xl font-bold text-center hover:bg-green-700">🌱 Crops</a>
+            <a href="/choose-leila" className="bg-purple-600 text-white py-4 rounded-xl font-bold text-center hover:bg-purple-700">👑 Choose</a>
+            <a href="/api/test-connection" className="bg-yellow-600 text-white py-4 rounded-xl font-bold text-center hover:bg-yellow-700">🔌 APIs</a>
+            <a href="/dashboard" className="bg-blue-600 text-white py-4 rounded-xl font-bold text-center hover:bg-blue-700">📊 Dashboard</a>
           </div>
         </div>
       </div>
