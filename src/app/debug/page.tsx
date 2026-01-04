@@ -1,3 +1,4 @@
+import AIResearchPanel from "@/components/AIResearchPanel";
 "use client";
 import { useState, useEffect } from 'react';
 import LeilaGoddess from '@/components/LeilaGoddess';
@@ -528,4 +529,5 @@ export default function UltimateDebugDashboard() {
       </div>
     </div>
   );
+      <AIResearchPanel />
 }
