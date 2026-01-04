@@ -1,106 +1,165 @@
 "use client";
+import React from 'react';
 
 interface LeilaGoddessProps {
-  isSpeaking?: boolean;
   size?: 'sm' | 'md' | 'lg';
+  isSpeaking?: boolean;
   showMana?: boolean;
 }
 
-export default function LeilaGoddess({ 
-  isSpeaking = false, 
-  size = 'md',
-  showMana = true 
-}: LeilaGoddessProps) {
-  const sizes = { sm: 120, md: 200, lg: 300 };
-  const w = sizes[size];
-  
+const LeilaGoddess: React.FC<LeilaGoddessProps> = ({ 
+  size = 'md', 
+  isSpeaking = false,
+  showMana = false
+}) => {
+  const sizeMap = {
+    sm: '120px',
+    md: '200px',
+    lg: '300px'
+  };
+
   return (
-    <div className="relative" style={{ width: w, height: w }}>
-      {isSpeaking && (
-        <div className="absolute inset-0 animate-pulse">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#FFE573]/30 via-[#FD437D]/20 to-[#902F9B]/30 rounded-full blur-3xl" />
-        </div>
-      )}
-      
-      <svg width={w} height={w} viewBox="0 0 300 300">
-        <defs>
-          <filter id="goddess-aura">
-            <feGaussianBlur stdDeviation="4" />
-            <feColorMatrix values="0 0 0 0 0.56 0 0 0 0 0.18 0 0 0 0 0.61 0 0 0 1 0"/>
-          </filter>
-          <linearGradient id="vine-hair" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#902F9B" />
-            <stop offset="40%" stopColor="#2d5016" />
-            <stop offset="100%" stopColor="#1a0b2e" />
-          </linearGradient>
-          <radialGradient id="skin-glow">
-            <stop offset="0%" stopColor="#3a2a4e" />
-            <stop offset="100%" stopColor="#1a0b2e" />
-          </radialGradient>
-        </defs>
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      viewBox="0 0 400 600"
+      width={sizeMap[size]}
+      height={sizeMap[size]}
+      className={`leila-goddess ${isSpeaking ? 'speaking' : ''}`}
+      aria-label="Leila - Hawaiian-Japanese Goddess of Agriculture"
+      role="img"
+    >
+      <defs>
+        <linearGradient id="skinGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#d4a574" />
+          <stop offset="100%" stopColor="#c89968" />
+        </linearGradient>
         
-        {/* Head */}
-        <ellipse cx="150" cy="130" rx="75" ry="90" fill="url(#skin-glow)" filter="url(#goddess-aura)" />
+        <linearGradient id="hairGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#1a0b2e" />
+          <stop offset="30%" stopColor="#1a0b2e" />
+          <stop offset="70%" stopColor="#2d1a4a" />
+          <stop offset="100%" stopColor="#902F9B" />
+        </linearGradient>
         
-        {/* Forehead to nose elegant line */}
-        <path d="M 150 45 Q 148 70 148 100 L 148 125" stroke="#5a4a6e" strokeWidth="3" fill="none" opacity="0.9" />
+        <radialGradient id="manaGlow">
+          <stop offset="0%" stopColor="#FFE573" stopOpacity="0.8" />
+          <stop offset="70%" stopColor="#FFE573" stopOpacity="0.3" />
+          <stop offset="100%" stopColor="#FFE573" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+
+      {/* HAIR */}
+      <g className="hair">
+        <path 
+          d="M200,80 Q180,100 160,120 Q140,140 120,160 Q100,200 90,250 Q80,300 85,350 Q90,400 110,450 Q130,500 180,520 Q250,540 320,500 Q350,450 340,400 Q330,350 310,300 Q290,250 280,200 Q270,150 260,120 Q250,90 230,80 Z" 
+          fill="url(#hairGradient)" 
+          stroke="#1a0b2e" 
+          strokeWidth="2"
+        />
         
-        {/* Nose */}
-        <path d="M 148 125 L 142 142 Q 147 145 152 143" fill="#4a3a5e" opacity="0.95" />
+        <path d="M200,85 Q190,110 185,130 Q180,150 175,170 Q170,190 165,210" 
+          fill="none" stroke="#902F9B" strokeWidth="1.5" strokeOpacity="0.6" />
+        <path d="M210,85 Q215,110 220,130 Q225,150 230,170 Q235,190 240,210" 
+          fill="none" stroke="#902F9B" strokeWidth="1.5" strokeOpacity="0.6" />
+        <path d="M220,100 Q225,130 230,160 Q235,190 240,220" 
+          fill="none" stroke="#6B21A8" strokeWidth="2" strokeOpacity="0.3" />
+      </g>
+
+      {/* FACE */}
+      <g className="face">
+        <path 
+          d="M200,120 Q180,130 170,150 Q160,180 155,210 Q150,240 148,270 Q146,300 150,330 Q155,360 165,380 Q180,400 200,410 Q220,400 235,380 Q245,360 250,330 Q255,300 253,270 Q250,240 245,210 Q240,180 230,150 Q220,130 200,120 Z" 
+          fill="url(#skinGradient)" 
+          stroke="#b58c5a" 
+          strokeWidth="2"
+        />
         
-        {/* Elegant lips (sacred smile of Laka) */}
-        <path d="M 138 158 Q 148 165 158 158" stroke="#FD437D" strokeWidth="4" fill="none" opacity="0.8" />
-        <ellipse cx="148" cy="160" rx="10" ry="5" fill="#FD437D" opacity="0.6" />
+        <ellipse cx="170" cy="280" rx="15" ry="10" fill="#e8c9a3" fillOpacity="0.3" />
         
-        {/* Chin */}
-        <path d="M 130 165 Q 148 180 165 165" stroke="#2a1a3e" strokeWidth="4" fill="none" opacity="0.9" />
+        {/* EARS */}
+        <path d="M165,200 Q160,210 165,220 Q170,230 175,220 Q180,210 175,200 Z" 
+          fill="url(#skinGradient)" stroke="#b58c5a" strokeWidth="1.5" />
         
-        {/* Eye (closed in meditation) */}
-        <ellipse cx="165" cy="110" rx="15" ry="4" fill="#FFE573" opacity="0.6">
-          {isSpeaking && <animate attributeName="ry" values="4;2;4" dur="3s" repeatCount="indefinite" />}
-        </ellipse>
+        {/* NOSE */}
+        <path d="M185,220 Q190,215 195,220 Q195,240 193,250" 
+          fill="none" stroke="#b58c5a" strokeWidth="1.5" />
         
-        {/* Third eye - MANA POINT */}
-        <circle cx="152" cy="80" r="5" fill="#FFE573" opacity="0.9">
-          {isSpeaking && <animate attributeName="opacity" values="0.9;1;0.9" dur="2s" repeatCount="indefinite" />}
+        {/* EYES */}
+        <g className="eyes">
+          <ellipse cx="170" cy="240" rx="8" ry="6" fill="#3C2A21" transform="rotate(-5 170 240)" />
+          <ellipse cx="170" cy="240" rx="3" ry="3" fill="#FFE573" transform="rotate(-5 170 240)" />
+          
+          <ellipse cx="210" cy="245" rx="6" ry="5" fill="#3C2A21" transform="rotate(2 210 245)" />
+          <ellipse cx="210" cy="245" rx="2" ry="2" fill="#FFE573" transform="rotate(2 210 245)" />
+          
+          <path d="M162,235 Q160,230 158,232" stroke="#1a0b2e" strokeWidth="1.5" />
+          <path d="M164,235 Q163,228 160,230" stroke="#1a0b2e" strokeWidth="1.5" />
+        </g>
+
+        {/* LIPS */}
+        <path 
+          d="M175,300 Q185,305 195,300 Q200,310 195,315 Q185,320 175,315 Q170,310 175,300 Z" 
+          fill="#FD437D" 
+          fillOpacity="0.6" 
+          stroke="#D43072" 
+          strokeWidth="1.5"
+        />
+      </g>
+
+      {/* THIRD EYE MANA POINT */}
+      <g className="mana-point">
+        <circle cx="195" cy="195" r="8" fill="url(#manaGlow)" opacity="0.7">
+          {isSpeaking && <animate attributeName="r" values="8;9;8" dur="1s" repeatCount="indefinite" />}
         </circle>
+        <circle cx="195" cy="195" r="4" fill="#FFE573" stroke="#FFD700" strokeWidth="1" />
+      </g>
+
+      {/* PLUMERIA FLOWERS */}
+      <g className="plumeria-adornments">
+        <g transform="translate(150, 190)">
+          <circle cx="0" cy="0" r="12" fill="#fef9e7" stroke="#FD437D" strokeWidth="1" />
+          <circle cx="0" cy="0" r="4" fill="#FD437D" />
+          <path d="M0,-12 Q4,-8 8,-12 Q12,-8 12,0 Q8,4 0,12 Q-8,4 -12,0 Q-12,-8 -8,-12 Q-4,-8 0,-12 Z" 
+            fill="#fef9e7" stroke="#FD437D" strokeWidth="1" />
+        </g>
         
-        {/* Flowing vine hair - LEFT SIDE */}
-        <path d="M 75 110 Q 50 130 60 200 Q 65 245 70 285" stroke="url(#vine-hair)" strokeWidth="6" fill="none" opacity="0.8" />
-        <path d="M 85 100 Q 60 140 70 210 Q 75 255 80 290" stroke="url(#vine-hair)" strokeWidth="5" fill="none" opacity="0.7" />
-        <path d="M 95 95 Q 70 150 80 220 Q 85 265 90 295" stroke="url(#vine-hair)" strokeWidth="4" fill="none" opacity="0.6" />
+        <g transform="translate(280, 150) rotate(20)">
+          <circle cx="0" cy="0" r="10" fill="#fef9e7" stroke="#FD437D" strokeWidth="1" />
+          <circle cx="0" cy="0" r="3" fill="#FD437D" />
+          <path d="M0,-10 Q3,-7 7,-10 Q10,-7 10,0 Q7,3 0,10 Q-7,3 -10,0 Q-10,-7 -7,-10 Q-3,-7 0,-10 Z" 
+            fill="#fef9e7" fillOpacity="0.9" stroke="#FD437D" strokeWidth="1" />
+        </g>
         
-        {/* Flowing vine hair - RIGHT SIDE */}
-        <path d="M 225 110 Q 250 130 240 200 Q 235 245 230 285" stroke="url(#vine-hair)" strokeWidth="6" fill="none" opacity="0.8" />
-        <path d="M 215 100 Q 240 140 230 210 Q 225 255 220 290" stroke="url(#vine-hair)" strokeWidth="5" fill="none" opacity="0.7" />
-        <path d="M 205 95 Q 230 150 220 220 Q 215 265 210 295" stroke="url(#vine-hair)" strokeWidth="4" fill="none" opacity="0.6" />
-        
-        {/* Plumeria hair ornaments */}
-        <circle cx="195" cy="90" r="10" fill="#FFE573" opacity="0.7" />
-        <circle cx="207" cy="96" r="8" fill="#FD437D" opacity="0.7" />
-        <circle cx="190" cy="102" r="7" fill="#902F9B" opacity="0.7" />
-        <circle cx="200" cy="85" r="6" fill="#ffffff" opacity="0.5" />
-        
-        {/* Neck/shoulders */}
-        <path d="M 105 200 L 105 260 M 195 200 L 195 260" stroke="url(#skin-glow)" strokeWidth="35" opacity="0.7" />
-      </svg>
-      
-      {showMana && (
-        <div className="absolute inset-0 pointer-events-none">
-          {[...Array(8)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-2 h-2 bg-[#FFE573] rounded-full animate-float"
-              style={{
-                left: `${15 + i * 12}%`,
-                top: `${25 + (i % 4) * 18}%`,
-                animationDelay: `${i * 0.4}s`,
-                opacity: 0.7
-              }}
-            />
-          ))}
-        </div>
-      )}
-    </div>
+        <g transform="translate(230, 100) rotate(-10)">
+          <circle cx="0" cy="0" r="8" fill="#fef9e7" stroke="#FD437D" strokeWidth="1" />
+          <circle cx="0" cy="0" r="2.5" fill="#FD437D" />
+        </g>
+      </g>
+
+      {/* LEI */}
+      <g className="lei">
+        <path d="M165,350 Q180,340 200,340 Q220,340 235,350" 
+          fill="none" stroke="#FFE573" strokeWidth="4" strokeOpacity="0.3" strokeLinecap="round" />
+        <circle cx="180" cy="345" r="3" fill="#FD437D" fillOpacity="0.6" />
+        <circle cx="200" cy="342" r="3" fill="#FFE573" fillOpacity="0.7" />
+        <circle cx="220" cy="345" r="3" fill="#FD437D" fillOpacity="0.6" />
+      </g>
+
+      {/* NECK AND SHOULDERS */}
+      <g className="neck-shoulders">
+        <path d="M185,410 Q190,430 195,450 Q200,470 205,450 Q210,430 215,410" 
+          fill="url(#skinGradient)" stroke="#b58c5a" strokeWidth="2" />
+        <path d="M150,450 Q180,460 200,465 Q220,460 250,450" 
+          fill="#d4a574" fillOpacity="0.7" stroke="#b58c5a" strokeWidth="2" />
+      </g>
+
+      {/* HAIR OVERLAY */}
+      <g className="hair-overlay">
+        <path d="M205,85 Q220,100 230,120 Q240,140 245,160 Q250,180 252,200" 
+          fill="none" stroke="#1a0b2e" strokeWidth="1.5" strokeOpacity="0.5" />
+      </g>
+    </svg>
   );
-}
+};
+
+export default LeilaGoddess;
