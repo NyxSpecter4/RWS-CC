@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@theme {
+  --color-goddess-purple: #902f9b;
+  --color-divine-gold: #ffe573;
+}
+
+@layer base {
+  html, body {
+    @apply h-screen w-screen overflow-hidden bg-black text-white;
+    margin: 0;
+    padding: 0;
+    position: fixed;
+  }
+}
+
+.crater-filter {
+  filter: url(#craterShader);
+}

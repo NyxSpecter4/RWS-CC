@@ -1,0 +1,7 @@
+archive_rws_cc/
+node_modules/
+.next/
+dist/
+build/
+*.min.js
+*.min.css
