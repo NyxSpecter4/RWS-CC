@@ -98,11 +98,11 @@ export default function CelestialAltar() {
         year1: '$0',
         year2: '$0',
         year3: '$400/mo',
-        maturity: '3 years minimum, hand-pollinated, 6mo cure time'
+        maturity: '3 years minimum, hand-pollinated, 6mo cure'
       },
       {
-        name: 'Fresh Ginger',
-        emoji: '🫚',
+        name: 'Turmeric',
+        emoji: '🟡',
         allocation: '0.2 acres',
         plants: 'Dense bed',
         status: 'Not yet planted',
@@ -144,10 +144,11 @@ export default function CelestialAltar() {
         </svg>
       </div>
 
-      {/* LEILA - RESPONSIVE */}
+      {/* LEILA WITH KAPA PATTERN - RESPONSIVE */}
       <div className="fixed top-4 right-4 md:top-6 md:right-6 z-50">
         <div className="relative">
           <div className="relative w-32 h-32 md:w-44 md:h-44">
+            {/* KAPA PATTERN BORDER */}
             <svg className="absolute inset-0 w-full h-full" viewBox="0 0 176 176">
               <defs>
                 <linearGradient id="kapaGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -155,8 +156,19 @@ export default function CelestialAltar() {
                   <stop offset="50%" stopColor="#FD437D" />
                   <stop offset="100%" stopColor="#FFE573" />
                 </linearGradient>
+                <pattern id="nihoPalaoa" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+                  <path d="M 0,12 L 12,0 L 12,24 Z" fill="url(#kapaGradient)" opacity="0.9"/>
+                  <path d="M 24,12 L 12,0 L 12,24 Z" fill="url(#kapaGradient)" opacity="0.6"/>
+                  <path d="M 6,12 L 9,9 L 9,15 Z" fill="#FFE573" opacity="0.8"/>
+                  <path d="M 18,12 L 15,9 L 15,15 Z" fill="#902F9B" opacity="0.7"/>
+                </pattern>
               </defs>
-              <circle cx="88" cy="88" r="86" fill="none" stroke="url(#kapaGradient)" strokeWidth="16"/>
+              <circle cx="88" cy="88" r="86" fill="none" stroke="url(#nihoPalaoa)" strokeWidth="16"/>
+              <circle cx="88" cy="88" r="78" fill="none" stroke="url(#kapaGradient)" strokeWidth="4" opacity="0.8"/>
+              <circle cx="88" cy="2" r="3" fill="#FFE573" opacity="0.9"/>
+              <circle cx="174" cy="88" r="3" fill="#FFE573" opacity="0.9"/>
+              <circle cx="88" cy="174" r="3" fill="#FFE573" opacity="0.9"/>
+              <circle cx="2" cy="88" r="3" fill="#FFE573" opacity="0.9"/>
             </svg>
 
             {goddessImage ? (
@@ -189,7 +201,7 @@ export default function CelestialAltar() {
         </div>
       </div>
 
-      {/* MOON - RESPONSIVE */}
+      {/* MOON */}
       <div className="relative z-10 flex flex-col items-center pt-8 md:pt-16">
         <svg width="280" height="280" viewBox="0 0 380 380" className="md:w-[380px] md:h-[380px] filter drop-shadow-[0_0_100px_rgba(255,229,115,0.8)]">
           <defs>
@@ -209,7 +221,7 @@ export default function CelestialAltar() {
         </div>
       </div>
 
-      {/* REALISTIC FARM PLAN - MOBILE RESPONSIVE WITH PROPER SPACING */}
+      {/* FARM PLAN WITH TURMERIC */}
       <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/95 to-transparent p-3 md:p-4 backdrop-blur-sm z-40 max-h-[40vh] md:max-h-none overflow-y-auto">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-2 md:mb-3">
@@ -218,7 +230,7 @@ export default function CelestialAltar() {
             <p className="text-white/60 text-xs">{farmPlan.status}</p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mb-16 md:mb-0">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mb-16 md:mb-4">
             {farmPlan.crops.map((crop) => (
               <div key={crop.name} className="bg-white/10 backdrop-blur-md rounded-lg md:rounded-xl p-2 md:p-3 border-2 border-white/20">
                 <div className="text-3xl md:text-4xl mb-1 md:mb-2 text-center">{crop.emoji}</div>
@@ -236,7 +248,6 @@ export default function CelestialAltar() {
         </div>
       </div>
 
-      {/* DASHBOARD LINK - RESPONSIVE */}
       <a href="/debug" className="fixed bottom-3 left-3 md:bottom-4 md:left-4 px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-[#902F9B] to-[#FD437D] text-white rounded-xl font-bold hover:scale-105 transition-all z-50 shadow-2xl text-sm md:text-base">
         🧠 Dashboard
       </a>
