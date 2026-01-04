@@ -1,11 +1,13 @@
 {
   "location": {
-    "name": "Hawaiian Acres, Hawaii",
+    "name": "Hawaiian Acres, Puna District, Hawaii Island",
     "coordinates": { "lat": 19.5428, "lon": -155.0506 },
     "zone": "USDA Zone 11a-12a",
     "elevation": "1000-1500 ft",
     "rainfall": "150-200 inches/year",
-    "soilType": "Volcanic, well-drained"
+    "soilType": "Volcanic, well-drained",
+    "dataSource": "Estimated - Contact UH CTAHR Extension Hilo for precise data",
+    "challenges": ["Extremely high rainfall", "Soil-borne diseases", "Waterlogging risk"]
   },
   
   "crops": {
@@ -31,11 +33,18 @@
         "mainBuyer": "Shaka Tea (CLOSED - diversify buyers!)",
         "challenge": "Act 242 protection helps, but need multiple buyers"
       },
+      "pestManagement": {
+        "CRITICAL": "Chinese Rose Beetles and Ramie Moths are MAJOR pests",
+        "trapCrop": "Plant roselle hibiscus nearby as trap crop - beetles prefer it!",
+        "solarTraps": "Use solar lamp traps for night-flying moths",
+        "mulching": "Apply mulch to suppress weeds and conserve moisture",
+        "monitoring": "Scout weekly for leaf damage, especially on young plants"
+      },
       "cultivationAdvice": {
         "soil": "Well-drained volcanic soil, pH 5.5-6.5",
-        "water": "Moderate, avoid waterlogging",
+        "water": "Moderate, avoid waterlogging in rainy season",
         "harvesting": "Pick young leaves before sunrise for highest quality",
-        "diseases": "Watch for root rot in rainy season",
+        "diseases": "Watch for root rot in rainy season - improve drainage",
         "preparation": "Dry leaves in shade, not direct sun",
         "marketing": "Emphasize 'Hawaii-grown' label (Act 242 protection)"
       }
@@ -62,11 +71,16 @@
         "demand": "HIGH (gourmet market)",
         "challenge": "Seasonal production, need storage/preservation plan"
       },
+      "pestManagement": {
+        "citrusLeafMiner": "Monitor for serpentine mines in new leaves",
+        "asianCitrusPsyllid": "CRITICAL - vector for greening disease",
+        "IPM": "Integrated pest management - encourage beneficial insects",
+        "spray": "Neem oil spray if infestations occur"
+      },
       "cultivationAdvice": {
         "soil": "Well-drained, slightly acidic",
         "water": "Regular during fruiting, reduce in winter",
         "pruning": "Annual pruning after harvest",
-        "pests": "Watch for citrus leaf miner, Asian citrus psyllid",
         "harvesting": "Pick when skin changes from green to burgundy/yellow",
         "preparation": "Contact UH CTAHR for variety recommendations",
         "marketing": "Target high-end restaurants, farmer's markets"
@@ -95,12 +109,18 @@
         "demand": "HIGH (premium market)",
         "challenge": "EXTREMELY labor-intensive, hand pollination required"
       },
+      "pestManagement": {
+        "snailsSlugs": "Major pest - handpick or use iron phosphate bait",
+        "rootRot": "Prevent waterlogging, ensure excellent drainage",
+        "fungalDiseases": "Watch for stem rot in humid conditions"
+      },
       "cultivationAdvice": {
-        "soil": "Rich organic matter, excellent drainage",
-        "water": "High humidity (70-80%), regular water",
+        "soil": "Rich organic matter, excellent drainage - CRITICAL in high rainfall",
+        "water": "High humidity (70-80%), but avoid standing water",
         "support": "Build sturdy trellises before planting",
-        "pollination": "HAND POLLINATE every flower at dawn (critical!)",
-        "curing": "6-month curing process required",
+        "pollination": "HAND POLLINATE every flower at dawn (use toothpick method)",
+        "technique": "Lift rostellum flap, press anther to stigma - practice first!",
+        "curing": "6-month curing process required - learn from experienced curer",
         "laborNeeds": "Plan for daily pollination during bloom (3-6 months)",
         "preparation": "Master curing technique or partner with experienced curer",
         "marketing": "Premium pricing for fresh Hawaiian vanilla"
@@ -129,10 +149,25 @@
         "demand": "MODERATE",
         "challenge": "Competition from cheap Peruvian imports"
       },
+      "pestManagement": {
+        "CRITICAL_DISEASE": "Bacterial wilt (Ralstonia solanacearum) - FATAL, NO CURE",
+        "prevention": [
+          "Use ONLY certified disease-free seed rhizomes",
+          "NEVER plant in soil - use soilless media ONLY",
+          "Test growing media before planting",
+          "Ensure EXCELLENT drainage - waterlogged soil spreads disease",
+          "NEVER plant downslope from infected fields",
+          "Avoid planting in wet weather",
+          "Sanitize all tools between plants",
+          "If disease appears: REMOVE and BURN affected plants immediately"
+        ],
+        "minorPests": "Chinese rose beetle (minor compared to bacterial wilt)"
+      },
       "cultivationAdvice": {
         "CRITICAL": "USE HYDROPONIC/SOILLESS ONLY!",
-        "disease": "Bacterial wilt (Ralstonia solanacearum) makes soil growing IMPOSSIBLE",
+        "disease": "Bacterial wilt makes soil growing IMPOSSIBLE in Hawaii",
         "method": "Coconut coir grow bags or hydroponic NFT system",
+        "drainage": "In 150-200 inch rainfall, use raised beds or containers",
         "water": "Keep substrate moist, not waterlogged",
         "harvesting": "Baby ginger at 4-6 months, mature at 8-10 months",
         "storage": "Can store rhizomes 2-3 months in cool, dry place",
@@ -163,10 +198,15 @@
         "demand": "MODERATE-HIGH",
         "challenge": "Massive imports from Fiji and India"
       },
+      "pestManagement": {
+        "CRITICAL_DISEASE": "Same bacterial wilt risk as ginger - FOLLOW SAME PROTOCOLS",
+        "prevention": "Identical to ginger - certified seed, soilless media, excellent drainage"
+      },
       "cultivationAdvice": {
         "CRITICAL": "USE HYDROPONIC/SOILLESS ONLY!",
         "disease": "Same bacterial wilt risk as ginger",
         "method": "Coconut coir grow bags or hydroponic system",
+        "drainage": "Critical in high rainfall - use raised beds minimum 12 inches",
         "water": "Regular moisture during growth, reduce before harvest",
         "harvesting": "When leaves yellow and dry (8-10 months)",
         "curing": "Boil, dry, and cure for maximum curcumin content",
@@ -180,40 +220,123 @@
     "rainy_season": {
       "months": "November-March",
       "rainfall": "Up to 200+ inches total",
-      "risks": ["Root rot", "Fungal diseases", "Flooding"],
-      "actions": ["Improve drainage", "Reduce watering", "Monitor for disease"]
+      "risks": ["Root rot", "Fungal diseases", "Flooding", "Bacterial wilt spread"],
+      "actions": [
+        "Improve drainage NOW before season starts",
+        "Reduce watering - let rain do the work",
+        "Monitor for disease daily",
+        "Avoid working in fields when wet (spreads disease)",
+        "Check drainage systems weekly"
+      ]
     },
     "dry_season": {
       "months": "April-October",
       "rainfall": "Lower but still significant",
       "risks": ["Water stress", "Slower growth"],
-      "actions": ["Maintain irrigation", "Mulch to retain moisture"]
+      "actions": ["Maintain irrigation", "Mulch to retain moisture", "Monitor soil moisture"]
     }
+  },
+  
+  "waterManagement": {
+    "highRainfall": {
+      "challenge": "150-200 inches/year creates waterlogging risk",
+      "solutions": [
+        "Raised beds: Minimum 12 inches high for ginger/turmeric",
+        "Contour planting: Follow land contours to slow water flow",
+        "Drainage ditches: Dig swales every 20-30 feet",
+        "Gravel base: Add 2-4 inches drainage layer under grow bags",
+        "Slope management: Plant on slight slope (2-5%) for natural drainage",
+        "Avoid low spots: Never plant in areas where water pools"
+      ],
+      "monitoring": "Check drainage after heavy rain - water should drain within 24 hours"
+    }
+  },
+  
+  "marketingChannels": {
+    "direct": {
+      "farmersMarkets": "Best margins, direct customer relationships",
+      "CSA": "Steady income, pre-sold harvest",
+      "farmStand": "Convenient for customers, requires daily staffing"
+    },
+    "wholesale": {
+      "restaurants": "Premium pricing for specialty crops (finger limes, vanilla)",
+      "retailers": "Health food stores, co-ops value local organic",
+      "distributors": "Volume sales but lower margins"
+    },
+    "valueAdd": {
+      "processing": "Dried māmaki tea, cured vanilla, pickled ginger",
+      "branding": "Tell your story - regenerative, moon-phase farming, Hawaiian culture"
+    },
+    "strategy": "BUILD BUYER RELATIONSHIPS BEFORE FIRST HARVEST!"
   },
   
   "preparationSteps": {
     "beforePlanting": [
+      "CONTACT UH CTAHR Extension in Hilo for site-specific advice",
       "Soil test for pH and nutrients",
-      "Build hydroponic/soilless systems for ginger & turmeric",
+      "Build raised beds (12+ inches) for ginger & turmeric",
+      "Set up soilless growing systems (coconut coir bags)",
       "Construct vanilla trellises (6ft tall, sturdy)",
-      "Install irrigation system with zones for each crop",
-      "Source certified disease-free planting material",
+      "Install drainage ditches/swales for water management",
+      "Source CERTIFIED DISEASE-FREE planting material (critical!)",
       "Build shade structures (50% shade for māmaki, vanilla)",
+      "Plant roselle hibiscus as trap crop for māmaki beetles",
+      "Set up solar lamp traps for moths",
       "Create composting area for organic matter"
     ],
     "firstMonth": [
-      "Plant māmaki (50 plants, 4x8ft spacing)",
-      "Plant ginger in coir bags (disease-free rhizomes)",
-      "Plant turmeric in coir bags (disease-free rhizomes)",
+      "Plant māmaki (50 plants, 4x8ft spacing) with roselle nearby",
+      "Plant ginger in raised coir bags (certified disease-free rhizomes)",
+      "Plant turmeric in raised coir bags (certified disease-free rhizomes)",
       "Establish vanilla vines on trellises",
-      "Wait on finger limes (research varieties first)"
+      "Wait on finger limes (contact CTAHR for variety recommendations first)",
+      "Install drainage systems and test after first rain",
+      "Scout for pests weekly - start monitoring immediately"
     ],
     "ongoing": [
       "Monitor weather daily (Hawaiian Acres gets 150-200in rain!)",
-      "Scout for pests/diseases weekly",
-      "Hand-pollinate vanilla flowers at DAWN during bloom",
-      "Build relationships with buyers BEFORE harvest",
-      "Keep detailed records of expenses, yields, weather"
+      "Scout for pests/diseases WEEKLY - early detection critical",
+      "Hand-pollinate vanilla flowers at DAWN during bloom (use toothpick)",
+      "Check drainage after every heavy rain",
+      "Sanitize tools between plants (prevent disease spread)",
+      "Build relationships with buyers 6 months BEFORE harvest",
+      "Keep detailed records: expenses, yields, weather, pest occurrences"
     ]
+  },
+  
+  "knfSchedule": {
+    "note": "General KNF applications - refine based on crop-specific needs",
+    "solutions": {
+      "IMO3": "Soil amendment at planting, every 3 months",
+      "FPJ": "Vegetative growth spray weekly (1:500 dilution)",
+      "OHN": "Disease prevention spray weekly (1:1000 dilution)",
+      "CalPhos": "Fruiting/flowering stage (1:1000)",
+      "WCA": "Calcium supplement during fruiting (1:1000)"
+    },
+    "source": "Natural Farming Hawaii - consult for crop-specific schedules"
+  },
+  
+  "criticalWarnings": [
+    "�� BACTERIAL WILT: Use soilless media for ginger/turmeric - NO EXCEPTIONS",
+    "🚨 DRAINAGE: In 150-200 inch rainfall, waterlogging = crop failure",
+    "🚨 CERTIFIED SEED: Never save ginger/turmeric seed from infected areas",
+    "🚨 VANILLA POLLINATION: Must pollinate by hand at dawn - no pollinators!",
+    "🚨 BUYER RELATIONSHIPS: Start marketing 6 months before harvest"
+  ],
+  
+  "expertContacts": {
+    "UH_CTAHR_Hilo": {
+      "service": "Extension Service - site-specific advice",
+      "contact": "Call or email for Hawaiian Acres specific data",
+      "topics": ["Soil tests", "Water management", "Variety selection", "KNF schedules"]
+    },
+    "Natural_Farming_Hawaii": {
+      "service": "KNF training and recipes",
+      "resource": "Crop-specific KNF application schedules"
+    },
+    "GoFarm_Hawaii": {
+      "service": "Business planning and marketing",
+      "resource": "Target market identification, value proposition"
+    }
   }
 }
