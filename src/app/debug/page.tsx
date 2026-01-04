@@ -527,7 +527,7 @@ export default function UltimateDebugDashboard() {
           🏝️ Home Page
         </a>
       </div>
+      <AIResearchPanel />
     </div>
   );
-      <AIResearchPanel />
 }
