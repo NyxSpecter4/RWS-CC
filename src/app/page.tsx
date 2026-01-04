@@ -4,10 +4,8 @@ import { useState, useEffect } from 'react';
 export default function CelestialAltar() {
   const [currentPhase, setCurrentPhase] = useState<'Hilo' | 'Kū' | 'Akua' | 'Muku'>('Hilo');
   const [goddessImage, setGoddessImage] = useState<string>('');
-  const [goddessEmotion, setGoddessEmotion] = useState<'happy' | 'wise' | 'urgent' | 'calm'>('wise');
-  const [speech, setSpeech] = useState('Loading intelligent guidance...');
+  const [speech, setSpeech] = useState('Aloha e! I am Leila. Generating my form and analyzing your farm...');
   const [loading, setLoading] = useState(false);
-  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
   useEffect(() => {
     const day = new Date().getDate();
@@ -16,15 +14,10 @@ export default function CelestialAltar() {
     else if (day <= 21) setCurrentPhase('Akua');
     else setCurrentPhase('Muku');
 
-    const saved = localStorage.getItem('leila_goddess_image');
-    if (saved) setGoddessImage(saved);
-
+    // AUTO GENERATE on first load
+    generateGoddess();
     getSmartGuidance();
-
-    // Update guidance every 2 minutes
-    const interval = setInterval(getSmartGuidance, 120000);
-    return () => clearInterval(interval);
-  }, [currentPhase]);
+  }, []);
 
   const generateGoddess = async () => {
     setLoading(true);
@@ -33,10 +26,9 @@ export default function CelestialAltar() {
       const data = await res.json();
       if (data.success && data.imageUrl) {
         setGoddessImage(data.imageUrl);
-        localStorage.setItem('leila_goddess_image', data.imageUrl);
       }
     } catch (e) {
-      console.error(e);
+      console.error('Goddess error:', e);
     } finally {
       setLoading(false);
     }
@@ -44,216 +36,156 @@ export default function CelestialAltar() {
 
   const getSmartGuidance = async () => {
     try {
-      // Gather ALL farm data
-      const sensorData = {
-        moisture_10cm: 45,
-        moisture_30cm: 52,
-        ec_30cm: 1.2,
-        temperature: 78
-      };
-
-      const marketData = {
-        mamaki: { price: 185, change: '+12%' },
-        finger_limes: { price: 45, change: '+7%' },
-        vanilla: { price: 320, change: '+2%' }
-      };
-
-      const soilData = {
-        organic_matter: 4.1,
-        last_knf: 'IMO #3',
-        yield_trend: '+50%'
-      };
-
       const res = await fetch('/api/leila-smart', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           phase: currentPhase,
-          sensorData,
-          marketData,
-          soilData
+          sensorData: { moisture_10cm: 45, ec_30cm: 1.2, temperature: 78 },
+          marketData: { mamaki: { price: 185, change: '+12%' } },
+          soilData: { organic_matter: 4.1, last_knf: 'IMO #3' }
         })
       });
-
-      const data = await res.json();
-      setSpeech(data.speech);
-      setGoddessEmotion(data.emotion);
-      setLastUpdate(new Date());
+      
+      if (res.ok) {
+        const data = await res.json();
+        setSpeech(data.speech || 'Aloha! Plant with the moon! 🌙');
+      }
     } catch (e) {
-      console.error('Smart guidance error:', e);
-      setSpeech('Aloha e! The mana flows strong today. Check your sensors and trust the ʻāina. 🌺');
-      setGoddessEmotion('wise');
+      console.error(e);
     }
   };
 
   const phaseData = {
-    Hilo: { 
-      hawaiian: 'Hilo', 
-      metaphor: 'Ka Pōʻe (The Empty Bowl)',
-      color: '#8B7355',
-      bgGradient: 'from-gray-900 to-purple-900'
-    },
-    Kū: { 
-      hawaiian: 'Kū', 
-      metaphor: 'Ka Piha (The Filling Bowl)',
-      color: '#902F9B',
-      bgGradient: 'from-purple-900 to-pink-900'
-    },
-    Akua: { 
-      hawaiian: 'Akua', 
-      metaphor: 'Ka Maona (The Full Bowl)',
-      color: '#FFE573',
-      bgGradient: 'from-yellow-600 to-orange-600'
-    },
-    Muku: { 
-      hawaiian: 'Muku', 
-      metaphor: 'Ka Nalo (The Draining Bowl)',
-      color: '#6B21A8',
-      bgGradient: 'from-purple-900 to-gray-900'
-    }
-  };
-
-  const crops = [
-    { name: 'Māmaki', price: '$185/lb', status: 'Harvest at Akua', emoji: '🌿', color: '#FFE573' },
-    { name: 'Finger Limes', price: '$45/lb', status: 'Transplant at Kū', emoji: '🍋', color: '#FD437D' },
-    { name: 'Vanilla', price: 'Premium', status: 'Pollinate at Akua', emoji: '🌺', color: '#902F9B' },
-    { name: 'Ginger', price: 'Fast Cash', status: 'Plant at Hilo', emoji: '🫚', color: '#FFE573' }
-  ];
-
-  const emotionStyles = {
-    happy: 'scale-105 animate-bounce',
-    wise: 'opacity-90',
-    urgent: 'scale-110 animate-pulse',
-    calm: 'opacity-80'
+    Hilo: { hawaiian: 'Hilo', metaphor: 'Ka Pōʻe (The Empty Bowl)', color: '#8B7355' },
+    Kū: { hawaiian: 'Kū', metaphor: 'Ka Piha (The Filling Bowl)', color: '#902F9B' },
+    Akua: { hawaiian: 'Akua', metaphor: 'Ka Maona (The Full Bowl)', color: '#FFE573' },
+    Muku: { hawaiian: 'Muku', metaphor: 'Ka Nalo (The Draining Bowl)', color: '#6B21A8' }
   };
 
   const current = phaseData[currentPhase];
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${current.bgGradient} relative overflow-hidden transition-all duration-1000`}>
+    <div className="min-h-screen relative overflow-hidden bg-[#0a0820]">
       
-      {/* Mana Particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(30)].map((_, i) => (
+      {/* SKY */}
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0820] via-[#1a1540] to-[#2d1b4e]"></div>
+        
+        {[...Array(200)].map((_, i) => (
           <div
             key={i}
-            className="absolute w-2 h-2 rounded-full bg-gradient-to-r from-[#FFE573] to-[#FD437D]"
+            className="absolute rounded-full bg-white"
             style={{
               left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animation: `float ${3 + Math.random() * 4}s ease-in-out ${Math.random() * 2}s infinite alternate`,
-              opacity: 0.4
+              top: `${Math.random() * 60}%`,
+              width: `${0.5 + Math.random() * 2}px`,
+              height: `${0.5 + Math.random() * 2}px`,
+              opacity: 0.4 + Math.random() * 0.6,
+              animation: `twinkle ${3 + Math.random() * 4}s ease-in-out infinite`
             }}
           />
         ))}
+        
+        <svg className="absolute bottom-0 w-full h-64 opacity-90" viewBox="0 0 1400 300" preserveAspectRatio="none">
+          <path d="M 0 300 L 0 150 Q 200 80, 400 150 L 400 300 Z" fill="#1a0f2e" opacity="0.9"/>
+          <path d="M 350 300 L 500 120 Q 700 60, 900 120 L 1100 180 L 1400 300 Z" fill="#0a0515"/>
+        </svg>
       </div>
 
-      {/* SMART GODDESS - TOP RIGHT */}
-      <div className="fixed top-4 right-4 z-50">
+      {/* LEILA */}
+      <div className="fixed top-6 right-6 z-50">
         <div className="relative">
-          {/* AI-POWERED Speech Bubble */}
-          <div className="absolute bottom-full right-0 mb-4 w-[28rem] bg-white/95 backdrop-blur-xl rounded-2xl p-5 shadow-2xl border-4 border-[#FFE573]">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-purple-600">🤖 AI-POWERED GUIDANCE</span>
-              <span className="text-xs text-gray-500">{lastUpdate.toLocaleTimeString()}</span>
-            </div>
-            <p className="text-gray-900 font-semibold text-base leading-relaxed">{speech}</p>
-            <div className="absolute -bottom-2 right-12 w-4 h-4 bg-white rotate-45 border-r-4 border-b-4 border-[#FFE573]"></div>
-            <button 
-              onClick={getSmartGuidance}
-              className="mt-3 text-xs text-purple-600 hover:text-purple-800 font-semibold"
-            >
-              ↻ Refresh Guidance
-            </button>
+          <div className="relative w-44 h-44">
+            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 176 176">
+              <defs>
+                <linearGradient id="kapaGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#902F9B" />
+                  <stop offset="50%" stopColor="#FD437D" />
+                  <stop offset="100%" stopColor="#FFE573" />
+                </linearGradient>
+              </defs>
+              <circle cx="88" cy="88" r="86" fill="none" stroke="url(#kapaGradient)" strokeWidth="16"/>
+            </svg>
+
+            {goddessImage ? (
+              <div className="absolute inset-3 rounded-full overflow-hidden shadow-2xl cursor-pointer hover:scale-105 transition-all"
+                   onClick={generateGoddess}>
+                <img src={goddessImage} alt="Leila" className="w-full h-full object-cover" />
+              </div>
+            ) : (
+              <div className="absolute inset-3 rounded-full bg-gradient-to-br from-[#902F9B] to-[#FD437D] flex items-center justify-center cursor-pointer shadow-2xl"
+                   onClick={generateGoddess}>
+                {loading ? (
+                  <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <div className="text-center px-4">
+                    <p className="text-white font-bold">Loading...</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* Goddess Avatar */}
-          {goddessImage ? (
-            <div className={`w-48 h-48 rounded-full overflow-hidden border-4 border-[#FFE573] shadow-2xl ${emotionStyles[goddessEmotion]} transition-all cursor-pointer`}
-                 onClick={generateGoddess}>
-              <img src={goddessImage} alt="Leila" className="w-full h-full object-cover" />
+          <div className="absolute top-full right-0 mt-4 w-[28rem] bg-white/98 backdrop-blur-xl rounded-2xl p-5 shadow-2xl border-4 border-[#FFE573]">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+              <span className="text-xs font-black text-purple-700 uppercase">AI LIVE ANALYSIS</span>
             </div>
-          ) : (
-            <div className="w-48 h-48 rounded-full bg-gradient-to-br from-[#902F9B] to-[#FD437D] flex items-center justify-center border-4 border-[#FFE573] cursor-pointer"
-                 onClick={generateGoddess}>
-              {loading ? (
-                <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-              ) : (
-                <span className="text-white font-bold">Generate</span>
-              )}
-            </div>
-          )}
+            <p className="text-gray-900 font-semibold text-base leading-relaxed mb-3">{speech}</p>
+            <button onClick={getSmartGuidance} className="text-xs text-purple-600 font-bold hover:text-purple-800">↻ Refresh</button>
+          </div>
         </div>
       </div>
 
-      {/* MOON - CENTER */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-8">
+      {/* MOON */}
+      <div className="relative z-10 flex flex-col items-center pt-16">
+        <svg width="380" height="380" viewBox="0 0 380 380" className="filter drop-shadow-[0_0_100px_rgba(255,229,115,0.8)]">
+          <defs>
+            <radialGradient id="moonGrad">
+              <stop offset="0%" stopColor="#fef9e7" />
+              <stop offset="100%" stopColor="#c8c0a8" />
+            </radialGradient>
+          </defs>
+          <circle cx="190" cy="190" r="170" fill="url(#moonGrad)" />
+        </svg>
         
-        <div className="mb-8 relative">
-          <svg width="500" height="500" viewBox="0 0 500 500" className="filter drop-shadow-[0_0_120px_rgba(255,229,115,0.9)]">
-            <defs>
-              <filter id="craters-deep">
-                <feTurbulence type="fractalNoise" baseFrequency="0.08 0.12" numOctaves="15" seed="7" />
-                <feDiffuseLighting lightingColor="#d4c9a8" surfaceScale="25" diffuseConstant="1.5">
-                  <feDistantLight azimuth="45" elevation="55" />
-                </feDiffuseLighting>
-                <feComposite operator="in" in2="SourceGraphic" />
-              </filter>
-              
-              <filter id="craters-medium">
-                <feTurbulence type="fractalNoise" baseFrequency="0.05 0.08" numOctaves="12" seed="3" />
-                <feDiffuseLighting lightingColor="#e8e4d0" surfaceScale="18" diffuseConstant="1.3">
-                  <feDistantLight azimuth="50" elevation="60" />
-                </feDiffuseLighting>
-                <feComposite operator="in" in2="SourceGraphic" />
-              </filter>
-
-              <radialGradient id="moonGrad">
-                <stop offset="0%" stopColor="#fef9e7" />
-                <stop offset="30%" stopColor="#f8f4d5" />
-                <stop offset="70%" stopColor="#e8e0c0" />
-                <stop offset="100%" stopColor="#c8c0a8" />
-              </radialGradient>
-            </defs>
-            
-            <circle cx="250" cy="250" r="230" fill="url(#moonGrad)" />
-            <circle cx="250" cy="250" r="230" fill="url(#moonGrad)" filter="url(#craters-deep)" opacity="0.9" />
-            <circle cx="250" cy="250" r="230" fill="url(#moonGrad)" filter="url(#craters-medium)" opacity="0.7" />
-          </svg>
-          
-          <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-center">
-            <h2 className="text-6xl font-black" style={{ color: current.color }}>
-              {current.hawaiian}
-            </h2>
-            <p className="text-xl font-bold text-white/70 mt-1">{current.metaphor}</p>
-          </div>
+        <div className="mt-6 text-center">
+          <h2 className="text-6xl font-black drop-shadow-lg" style={{ color: current.color }}>
+            {current.hawaiian}
+          </h2>
+          <p className="text-xl font-bold text-white/90 mt-1 drop-shadow-md">{current.metaphor}</p>
         </div>
       </div>
 
       {/* CROPS */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/80 to-transparent p-6 backdrop-blur-sm">
-        <div className="grid grid-cols-4 gap-4 max-w-6xl mx-auto">
-          {crops.map((crop, i) => (
-            <div key={i} className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 hover:scale-105 transition-all">
-              <div className="text-4xl mb-2 text-center">{crop.emoji}</div>
-              <h4 className="font-bold text-white text-center mb-1">{crop.name}</h4>
-              <p className="text-center font-bold text-xl mb-1" style={{ color: crop.color }}>{crop.price}</p>
-              <p className="text-xs text-white/50 text-center">{crop.status}</p>
-            </div>
-          ))}
+      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex gap-4">
+        <div className="bg-green-900/40 p-4 rounded-xl border-2 border-green-500/40">
+          <div className="text-4xl mb-2">🌿</div>
+          <p className="text-white text-sm font-bold">Māmaki</p>
+        </div>
+        <div className="bg-yellow-900/40 p-4 rounded-xl border-2 border-yellow-500/40">
+          <div className="text-4xl mb-2">🍋</div>
+          <p className="text-white text-sm font-bold">Finger Limes</p>
+        </div>
+        <div className="bg-purple-900/40 p-4 rounded-xl border-2 border-purple-500/40">
+          <div className="text-4xl mb-2">🌺</div>
+          <p className="text-white text-sm font-bold">Vanilla</p>
+        </div>
+        <div className="bg-orange-900/40 p-4 rounded-xl border-2 border-orange-500/40">
+          <div className="text-4xl mb-2">🫚</div>
+          <p className="text-white text-sm font-bold">Ginger</p>
         </div>
       </div>
 
-      {/* EXPERT PANEL LINK */}
-      <a href="/debug" 
-         className="fixed bottom-4 left-4 px-6 py-3 bg-gradient-to-r from-[#902F9B] to-[#FD437D] text-white rounded-xl font-bold hover:scale-105 transition-all z-50 shadow-2xl flex items-center gap-2">
-        🧠 Expert Panel
+      <a href="/debug" className="fixed bottom-4 left-4 px-6 py-3 bg-gradient-to-r from-[#902F9B] to-[#FD437D] text-white rounded-xl font-bold hover:scale-105 transition-all z-50 shadow-2xl">
+        🧠 Dashboard
       </a>
 
       <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0) rotate(0deg); }
-          50% { transform: translateY(-20px) rotate(180deg); }
+        @keyframes twinkle {
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 1; }
         }
       `}</style>
     </div>
