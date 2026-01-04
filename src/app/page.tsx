@@ -1,13 +1,13 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, RefreshCw } from 'lucide-react';
 
 export default function CelestialAltar() {
   const [currentPhase, setCurrentPhase] = useState<'Hilo' | 'Kū' | 'Akua' | 'Muku'>('Hilo');
   const [goddessImage, setGoddessImage] = useState<string>('');
-  const [speech, setSpeech] = useState('Aloha e! I am Leila. Generating my form and analyzing your farm...');
-  const [loading, setLoading] = useState(false);
+  const [speech, setSpeech] = useState('Aloha e! I am Leila, your AI farm advisor.');
   const [chatOpen, setChatOpen] = useState(true);
+  const [availableLeilas, setAvailableLeilas] = useState<string[]>([]);
 
   useEffect(() => {
     const day = new Date().getDate();
@@ -16,23 +16,46 @@ export default function CelestialAltar() {
     else if (day <= 21) setCurrentPhase('Akua');
     else setCurrentPhase('Muku');
 
-    // AUTO-GENERATE LEILA ON LOAD
-    generateGoddess();
+    // LOAD FROM SAVED LIKED LEILAS
+    loadRandomLikedLeila();
     getSmartGuidance();
   }, []);
 
-  const generateGoddess = async () => {
-    setLoading(true);
+  const loadRandomLikedLeila = () => {
     try {
-      const res = await fetch('/api/generate-goddess', { method: 'POST' });
-      const data = await res.json();
-      if (data.success && data.imageUrl) {
-        setGoddessImage(data.imageUrl);
+      // Get all ratings from localStorage
+      const savedRatings = localStorage.getItem('leila_ratings');
+      
+      if (savedRatings) {
+        const ratings = JSON.parse(savedRatings);
+        
+        // Filter only thumbs-up ratings
+        const likedLeilas = ratings
+          .filter((r: any) => r.rating === 'up')
+          .map((r: any) => r.url);
+        
+        if (likedLeilas.length > 0) {
+          setAvailableLeilas(likedLeilas);
+          // Pick a random one from liked images
+          const randomLeila = likedLeilas[Math.floor(Math.random() * likedLeilas.length)];
+          setGoddessImage(randomLeila);
+          return;
+        }
       }
+      
+      // If no liked Leilas, show placeholder
+      setGoddessImage('');
     } catch (e) {
-      console.error('Goddess error:', e);
-    } finally {
-      setLoading(false);
+      console.error('Error loading Leila:', e);
+      setGoddessImage('');
+    }
+  };
+
+  const changeLeilaImage = () => {
+    // Cycle through liked Leilas
+    if (availableLeilas.length > 0) {
+      const randomLeila = availableLeilas[Math.floor(Math.random() * availableLeilas.length)];
+      setGoddessImage(randomLeila);
     }
   };
 
@@ -99,7 +122,7 @@ export default function CelestialAltar() {
         </svg>
       </div>
 
-      {/* LEILA - AUTO-GENERATES */}
+      {/* LEILA - FROM SAVED LIKED IMAGES */}
       <div className="fixed top-4 right-4 md:top-6 md:right-6 z-50">
         <div className="relative">
           <div className="relative w-32 h-32 md:w-44 md:h-44">
@@ -126,16 +149,26 @@ export default function CelestialAltar() {
             </svg>
 
             {goddessImage ? (
-              <div className="absolute inset-3 rounded-full overflow-hidden shadow-2xl cursor-pointer hover:scale-105 transition-all"
-                   onClick={() => setChatOpen(!chatOpen)}>
+              <div className="absolute inset-3 rounded-full overflow-hidden shadow-2xl">
                 <img src={goddessImage} alt="Leila" className="w-full h-full object-cover" />
+                <button
+                  onClick={changeLeilaImage}
+                  className="absolute bottom-0 right-0 w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700"
+                  title="Change Leila"
+                >
+                  <RefreshCw className="w-4 h-4 text-white" />
+                </button>
               </div>
             ) : (
-              <div className="absolute inset-3 rounded-full bg-gradient-to-br from-[#902F9B] to-[#FD437D] flex items-center justify-center shadow-2xl">
-                {loading && (
-                  <div className="w-8 h-8 md:w-12 md:h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-                )}
-              </div>
+              <a 
+                href="/debug"
+                className="absolute inset-3 rounded-full bg-gradient-to-br from-[#902F9B] to-[#FD437D] flex items-center justify-center shadow-2xl hover:scale-105 transition-all"
+              >
+                <div className="text-center px-2">
+                  <p className="text-white font-bold text-xs">Go to Debug</p>
+                  <p className="text-white/80 text-[10px]">Rate some Leilas!</p>
+                </div>
+              </a>
             )}
           </div>
 
