@@ -1,11 +1,11 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { X, RefreshCw } from 'lucide-react';
+import { X } from 'lucide-react';
 
 export default function CelestialAltar() {
   const [currentPhase, setCurrentPhase] = useState<'Hilo' | 'Kū' | 'Akua' | 'Muku'>('Hilo');
   const [goddessImage, setGoddessImage] = useState<string>('');
-  const [speech, setSpeech] = useState('Aloha e! I am Leila, your AI farm advisor.');
+  const [speech, setSpeech] = useState('Aloha e! I am Leila. Generating my form and analyzing your farm...');
   const [loading, setLoading] = useState(false);
   const [chatOpen, setChatOpen] = useState(true);
 
@@ -16,23 +16,17 @@ export default function CelestialAltar() {
     else if (day <= 21) setCurrentPhase('Akua');
     else setCurrentPhase('Muku');
 
-    // LOAD SAVED LEILA - DON'T REGENERATE!
-    const saved = localStorage.getItem('leila_goddess_image');
-    if (saved) {
-      setGoddessImage(saved);
-    }
-
+    // AUTO-GENERATE LEILA ON LOAD
+    generateGoddess();
     getSmartGuidance();
   }, []);
 
-  const manualGenerateGoddess = async () => {
+  const generateGoddess = async () => {
     setLoading(true);
     try {
       const res = await fetch('/api/generate-goddess', { method: 'POST' });
       const data = await res.json();
       if (data.success && data.imageUrl) {
-        // Save to localStorage
-        localStorage.setItem('leila_goddess_image', data.imageUrl);
         setGoddessImage(data.imageUrl);
       }
     } catch (e) {
@@ -105,7 +99,7 @@ export default function CelestialAltar() {
         </svg>
       </div>
 
-      {/* LEILA - NO AUTO GENERATION */}
+      {/* LEILA - AUTO-GENERATES */}
       <div className="fixed top-4 right-4 md:top-6 md:right-6 z-50">
         <div className="relative">
           <div className="relative w-32 h-32 md:w-44 md:h-44">
@@ -132,25 +126,14 @@ export default function CelestialAltar() {
             </svg>
 
             {goddessImage ? (
-              <div className="absolute inset-3 rounded-full overflow-hidden shadow-2xl">
+              <div className="absolute inset-3 rounded-full overflow-hidden shadow-2xl cursor-pointer hover:scale-105 transition-all"
+                   onClick={() => setChatOpen(!chatOpen)}>
                 <img src={goddessImage} alt="Leila" className="w-full h-full object-cover" />
-                <button
-                  onClick={manualGenerateGoddess}
-                  className="absolute bottom-0 right-0 w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700"
-                  title="Generate new Leila"
-                >
-                  <RefreshCw className="w-4 h-4 text-white" />
-                </button>
               </div>
             ) : (
-              <div className="absolute inset-3 rounded-full bg-gradient-to-br from-[#902F9B] to-[#FD437D] flex items-center justify-center cursor-pointer shadow-2xl"
-                   onClick={manualGenerateGoddess}>
-                {loading ? (
+              <div className="absolute inset-3 rounded-full bg-gradient-to-br from-[#902F9B] to-[#FD437D] flex items-center justify-center shadow-2xl">
+                {loading && (
                   <div className="w-8 h-8 md:w-12 md:h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-                ) : (
-                  <div className="text-center px-2">
-                    <p className="text-white font-bold text-xs">Generate Leila</p>
-                  </div>
                 )}
               </div>
             )}
