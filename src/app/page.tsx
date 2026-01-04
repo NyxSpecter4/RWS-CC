@@ -1,11 +1,11 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, RefreshCw } from 'lucide-react';
 
 export default function CelestialAltar() {
   const [currentPhase, setCurrentPhase] = useState<'Hilo' | 'Kū' | 'Akua' | 'Muku'>('Hilo');
   const [goddessImage, setGoddessImage] = useState<string>('');
-  const [speech, setSpeech] = useState('Aloha e! I am Leila. Generating my form and analyzing your farm...');
+  const [speech, setSpeech] = useState('Aloha e! I am Leila, your AI farm advisor.');
   const [loading, setLoading] = useState(false);
   const [chatOpen, setChatOpen] = useState(true);
 
@@ -16,16 +16,23 @@ export default function CelestialAltar() {
     else if (day <= 21) setCurrentPhase('Akua');
     else setCurrentPhase('Muku');
 
-    generateGoddess();
+    // LOAD SAVED LEILA - DON'T REGENERATE!
+    const saved = localStorage.getItem('leila_goddess_image');
+    if (saved) {
+      setGoddessImage(saved);
+    }
+
     getSmartGuidance();
   }, []);
 
-  const generateGoddess = async () => {
+  const manualGenerateGoddess = async () => {
     setLoading(true);
     try {
       const res = await fetch('/api/generate-goddess', { method: 'POST' });
       const data = await res.json();
       if (data.success && data.imageUrl) {
+        // Save to localStorage
+        localStorage.setItem('leila_goddess_image', data.imageUrl);
         setGoddessImage(data.imageUrl);
       }
     } catch (e) {
@@ -65,15 +72,12 @@ export default function CelestialAltar() {
   };
 
   const farmPlan = {
-    currentYear: 1,
-    status: 'Establishment Phase - Planting in Progress',
-    currentRevenue: '$0/month',
     crops: [
-      { name: 'Māmaki Tea', emoji: '🌿', allocation: '0.25 acres', plants: '50 plants', status: 'Not yet planted', year1: '$0', year2: '$200/mo', year3: '$500/mo' },
-      { name: 'Finger Limes', emoji: '🍋', allocation: '0.2 acres', plants: '20 trees', status: 'Not yet planted', year1: '$0', year2: '$0', year3: '$300/mo' },
-      { name: 'Vanilla Beans', emoji: '🌺', allocation: '0.2 acres', plants: '60 vines', status: 'Not yet planted', year1: '$0', year2: '$0', year3: '$400/mo' },
-      { name: 'Fresh Ginger', emoji: '��', allocation: '0.15 acres', plants: 'Dense bed', status: 'Not yet planted', year1: '$0', year2: '$200/mo', year3: '$300/mo' },
-      { name: 'Turmeric', emoji: '🟡', allocation: '0.15 acres', plants: 'Dense bed', status: 'Not yet planted', year1: '$0', year2: '$200/mo', year3: '$300/mo' }
+      { name: 'Māmaki Tea', emoji: '🌿', allocation: '0.25 acres', status: 'Not yet planted', year1: '$0', year2: '$200/mo', year3: '$500/mo' },
+      { name: 'Finger Limes', emoji: '🍋', allocation: '0.2 acres', status: 'Not yet planted', year1: '$0', year2: '$0', year3: '$300/mo' },
+      { name: 'Vanilla Beans', emoji: '🌺', allocation: '0.2 acres', status: 'Not yet planted', year1: '$0', year2: '$0', year3: '$400/mo' },
+      { name: 'Fresh Ginger', emoji: '🫚', allocation: '0.15 acres', status: 'Not yet planted', year1: '$0', year2: '$200/mo', year3: '$300/mo' },
+      { name: 'Turmeric', emoji: '🟡', allocation: '0.15 acres', status: 'Not yet planted', year1: '$0', year2: '$200/mo', year3: '$300/mo' }
     ]
   };
 
@@ -85,7 +89,6 @@ export default function CelestialAltar() {
       {/* SKY */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0820] via-[#1a1540] to-[#2d1b4e]"></div>
-        
         {[...Array(200)].map((_, i) => (
           <div key={i} className="absolute rounded-full bg-white"
             style={{
@@ -96,14 +99,13 @@ export default function CelestialAltar() {
             }}
           />
         ))}
-        
         <svg className="absolute bottom-0 w-full h-64 opacity-90" viewBox="0 0 1400 300" preserveAspectRatio="none">
           <path d="M 0 300 L 0 150 Q 200 80, 400 150 L 400 300 Z" fill="#1a0f2e" opacity="0.9"/>
           <path d="M 350 300 L 500 120 Q 700 60, 900 120 L 1100 180 L 1400 300 Z" fill="#0a0515"/>
         </svg>
       </div>
 
-      {/* LEILA WITH CLOSEABLE CHAT */}
+      {/* LEILA - NO AUTO GENERATION */}
       <div className="fixed top-4 right-4 md:top-6 md:right-6 z-50">
         <div className="relative">
           <div className="relative w-32 h-32 md:w-44 md:h-44">
@@ -130,31 +132,33 @@ export default function CelestialAltar() {
             </svg>
 
             {goddessImage ? (
-              <div className="absolute inset-3 rounded-full overflow-hidden shadow-2xl cursor-pointer hover:scale-105 transition-all"
-                   onClick={() => setChatOpen(!chatOpen)}>
+              <div className="absolute inset-3 rounded-full overflow-hidden shadow-2xl">
                 <img src={goddessImage} alt="Leila" className="w-full h-full object-cover" />
+                <button
+                  onClick={manualGenerateGoddess}
+                  className="absolute bottom-0 right-0 w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700"
+                  title="Generate new Leila"
+                >
+                  <RefreshCw className="w-4 h-4 text-white" />
+                </button>
               </div>
             ) : (
               <div className="absolute inset-3 rounded-full bg-gradient-to-br from-[#902F9B] to-[#FD437D] flex items-center justify-center cursor-pointer shadow-2xl"
-                   onClick={generateGoddess}>
+                   onClick={manualGenerateGoddess}>
                 {loading ? (
                   <div className="w-8 h-8 md:w-12 md:h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
                 ) : (
                   <div className="text-center px-2">
-                    <p className="text-white font-bold text-xs md:text-sm">Loading...</p>
+                    <p className="text-white font-bold text-xs">Generate Leila</p>
                   </div>
                 )}
               </div>
             )}
           </div>
 
-          {/* CLOSEABLE CHAT BUBBLE */}
           {chatOpen && (
             <div className="absolute top-full right-0 mt-3 w-72 md:w-[28rem] bg-white/98 backdrop-blur-xl rounded-2xl p-4 md:p-5 shadow-2xl border-4 border-[#FFE573]">
-              <button 
-                onClick={() => setChatOpen(false)}
-                className="absolute top-2 right-2 w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700 transition-all"
-              >
+              <button onClick={() => setChatOpen(false)} className="absolute top-2 right-2 w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700">
                 <X className="w-4 h-4 text-white" />
               </button>
               <div className="flex items-center gap-2 mb-2">
@@ -166,12 +170,8 @@ export default function CelestialAltar() {
             </div>
           )}
 
-          {/* REOPEN BUTTON */}
           {!chatOpen && (
-            <button
-              onClick={() => setChatOpen(true)}
-              className="absolute top-full right-0 mt-3 px-4 py-2 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-all text-sm"
-            >
+            <button onClick={() => setChatOpen(true)} className="absolute top-full right-0 mt-3 px-4 py-2 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 text-sm">
               💬 Open Chat
             </button>
           )}
@@ -181,43 +181,32 @@ export default function CelestialAltar() {
       {/* MOON */}
       <div className="relative z-10 flex flex-col items-center pt-8 md:pt-16">
         <svg width="280" height="280" viewBox="0 0 380 380" className="md:w-[380px] md:h-[380px] filter drop-shadow-[0_0_100px_rgba(255,229,115,0.8)]">
-          <defs>
-            <radialGradient id="moonGrad">
-              <stop offset="0%" stopColor="#fef9e7" />
-              <stop offset="100%" stopColor="#c8c0a8" />
-            </radialGradient>
-          </defs>
+          <defs><radialGradient id="moonGrad"><stop offset="0%" stopColor="#fef9e7" /><stop offset="100%" stopColor="#c8c0a8" /></radialGradient></defs>
           <circle cx="190" cy="190" r="170" fill="url(#moonGrad)" />
         </svg>
-        
         <div className="mt-4 md:mt-6 text-center px-4">
-          <h2 className="text-4xl md:text-6xl font-black drop-shadow-lg" style={{ color: current.color }}>
-            {current.hawaiian}
-          </h2>
+          <h2 className="text-4xl md:text-6xl font-black drop-shadow-lg" style={{ color: current.color }}>{current.hawaiian}</h2>
           <p className="text-base md:text-xl font-bold text-white/90 mt-1 drop-shadow-md">{current.metaphor}</p>
         </div>
       </div>
 
-      {/* 5 CROPS */}
+      {/* CROPS */}
       <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/95 to-transparent p-3 md:p-4 backdrop-blur-sm z-40 max-h-[45vh] md:max-h-none overflow-y-auto">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-2 md:mb-3">
-            <p className="text-white font-bold text-sm md:text-lg">🌱 1-Acre Regenerative Farm Plan</p>
-            <p className="text-yellow-400 font-black text-lg md:text-2xl">{farmPlan.currentRevenue}</p>
-            <p className="text-white/60 text-xs">{farmPlan.status}</p>
+            <p className="text-white font-bold text-sm md:text-lg">🌱 1-Acre Regenerative Farm</p>
+            <p className="text-yellow-400 font-black text-lg md:text-2xl">$0/month</p>
+            <p className="text-white/60 text-xs">Year 1 - Establishment</p>
           </div>
-
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 md:gap-3 mb-16 md:mb-4">
             {farmPlan.crops.map((crop) => (
-              <div key={crop.name} className="bg-white/10 backdrop-blur-md rounded-lg md:rounded-xl p-2 md:p-3 border-2 border-white/20">
+              <div key={crop.name} className="bg-white/10 backdrop-blur-md rounded-lg p-2 md:p-3 border-2 border-white/20">
                 <div className="text-2xl md:text-3xl mb-1 text-center">{crop.emoji}</div>
                 <h4 className="font-bold text-white text-center text-[10px] md:text-xs mb-1">{crop.name}</h4>
                 <p className="text-[9px] md:text-xs text-white/60 text-center mb-1">{crop.allocation}</p>
                 <p className="text-[9px] md:text-xs text-orange-400 font-bold text-center mb-1">{crop.status}</p>
                 <div className="text-[8px] md:text-[10px] text-white/50 text-center space-y-0.5">
-                  <p>Y1: {crop.year1}</p>
-                  <p>Y2: {crop.year2}</p>
-                  <p>Y3+: {crop.year3}</p>
+                  <p>Y1: {crop.year1}</p><p>Y2: {crop.year2}</p><p>Y3+: {crop.year3}</p>
                 </div>
               </div>
             ))}
@@ -225,9 +214,9 @@ export default function CelestialAltar() {
         </div>
       </div>
 
-      {/* NAVIGATION */}
+      {/* NAV */}
       <div className="fixed bottom-3 left-3 md:bottom-4 md:left-4 z-50 flex gap-2">
-        <a href="/dashboard" className="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-[#902F9B] to-[#FD437D] text-white rounded-xl font-bold hover:scale-105 transition-all shadow-2xl text-sm md:text-base">
+        <a href="/dashboard" className="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-bold hover:scale-105 transition-all shadow-2xl text-sm md:text-base">
           📊 Dashboard
         </a>
         <a href="/debug" className="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold hover:scale-105 transition-all shadow-2xl text-sm md:text-base">
@@ -235,12 +224,7 @@ export default function CelestialAltar() {
         </a>
       </div>
 
-      <style jsx>{`
-        @keyframes twinkle {
-          0%, 100% { opacity: 0.3; }
-          50% { opacity: 1; }
-        }
-      `}</style>
+      <style jsx>{`@keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }`}</style>
     </div>
   );
 }
