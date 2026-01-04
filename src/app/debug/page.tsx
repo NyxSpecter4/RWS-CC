@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import SoilHealthTracker from '@/components/SoilHealthTracker';
 import SmartSensorAlerts from '@/components/SmartSensorAlerts';
+import MarketIntelligence from '@/components/MarketIntelligence';
 import ExpertPanel from '@/components/ExpertPanel';
 import { Brain } from 'lucide-react';
 
@@ -72,4 +73,10 @@ export default function UltimateDebugDashboard() {
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-cyan-400 mb-4">📡 AgTech IoT - Smart Sensor Intelligence</h2>
         <SmartSensorAlerts />
+      </div>
+
+      {/* MARKET INTELLIGENCE */}
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-green-400 mb-4">📊 Market Intelligence & Buyer Tracking</h2>
+        <MarketIntelligence />
       </div>
