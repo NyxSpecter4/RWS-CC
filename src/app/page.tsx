@@ -1,13 +1,14 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Moon, Droplets, Thermometer, Leaf } from 'lucide-react';
+import { Moon, Droplets, Thermometer, Leaf, Eye, Sparkles } from 'lucide-react';
 
 export default function CelestialAltar() {
   const [currentPhase, setCurrentPhase] = useState<'Hilo' | 'Kū' | 'Akua' | 'Muku'>('Akua');
   const [goddessImage, setGoddessImage] = useState<string>('');
   const [wisdomText, setWisdomText] = useState('');
   const [showPanel, setShowPanel] = useState(false);
-  const [sensorData, setSensorData] = useState<any>(null);
+  const [designFeedback, setDesignFeedback] = useState<any>(null);
+  const [analyzing, setAnalyzing] = useState(false);
 
   useEffect(() => {
     const day = new Date().getDate();
@@ -18,7 +19,9 @@ export default function CelestialAltar() {
 
     generateGoddess();
     getLeilaWisdom();
-    loadSensorData();
+    
+    // Auto-analyze design on load
+    setTimeout(analyzeDesign, 2000);
   }, []);
 
   const generateGoddess = async () => {
@@ -45,13 +48,21 @@ export default function CelestialAltar() {
     }
   };
 
-  const loadSensorData = async () => {
+  const analyzeDesign = async () => {
+    setAnalyzing(true);
     try {
-      const res = await fetch('/api/sensor-data');
+      // Take screenshot (simplified - just analyze current state)
+      const res = await fetch('/api/analyze-design', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ screenshot: 'base64...' })
+      });
       const data = await res.json();
-      setSensorData(data);
+      setDesignFeedback(data);
     } catch (e) {
-      console.error('Failed to load sensor data:', e);
+      console.error('Analysis failed:', e);
+    } finally {
+      setAnalyzing(false);
     }
   };
 
@@ -64,6 +75,51 @@ export default function CelestialAltar() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#020103] via-[#1a0b2e] to-[#020103] relative overflow-hidden">
+      
+      {/* AI DESIGN FEEDBACK PANEL - AUTOMATIC */}
+      {designFeedback && (
+        <div className="fixed top-4 right-4 w-96 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-6 z-50 max-h-[80vh] overflow-y-auto">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Eye className="w-6 h-6 text-[#902F9B]" />
+              <h3 className="text-xl font-bold">AI Design Feedback</h3>
+            </div>
+            <button onClick={() => setDesignFeedback(null)} className="text-gray-400 hover:text-gray-600">✕</button>
+          </div>
+
+          <div className="space-y-4">
+            {designFeedback.feedback?.map((item: any, i: number) => (
+              <div key={i} className={`p-4 rounded-xl border-2 ${
+                item.priority === 'URGENT' ? 'bg-red-50 border-red-300' :
+                item.priority === 'HIGH' ? 'bg-orange-50 border-orange-300' :
+                'bg-blue-50 border-blue-300'
+              }`}>
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-bold text-gray-900">{item.area}</h4>
+                  <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                    item.priority === 'URGENT' ? 'bg-red-500' :
+                    item.priority === 'HIGH' ? 'bg-orange-500' : 'bg-blue-500'
+                  } text-white`}>
+                    {item.priority}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-700 mb-2">❌ Issue: {item.issue}</p>
+                <p className="text-sm text-gray-900 font-semibold">✅ Fix: {item.suggestion}</p>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={analyzeDesign}
+            disabled={analyzing}
+            className="w-full mt-4 px-4 py-3 bg-gradient-to-r from-[#902F9B] to-[#FD437D] text-white rounded-lg font-bold hover:opacity-90 disabled:opacity-50"
+          >
+            {analyzing ? 'Analyzing...' : 'Re-Analyze Design'}
+          </button>
+        </div>
+      )}
+
+      {/* GODDESS & MOON */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-8">
         
         <div className="mb-12 relative">
@@ -100,29 +156,33 @@ export default function CelestialAltar() {
         <div className="mb-8">
           {goddessImage ? (
             <div className="w-64 h-64 rounded-full overflow-hidden border-4 border-[#FFE573] shadow-2xl shadow-[#902F9B]/50">
-              <img src={goddessImage} alt="Leila - Hawaiian Goddess" className="w-full h-full object-cover" />
+              <img src={goddessImage} alt="Leila" className="w-full h-full object-cover" />
             </div>
           ) : (
-            <div className="w-64 h-64 rounded-full bg-gradient-to-br from-[#902F9B] to-[#FD437D] flex items-center justify-center border-4 border-[#FFE573] shadow-2xl cursor-pointer hover:scale-105 transition-transform" onClick={generateGoddess}>
-              <div className="text-center">
-                <p className="text-white text-sm mb-2">Click to manifest</p>
-                <p className="text-white/60 text-xs">Leila goddess</p>
-              </div>
+            <div className="w-64 h-64 rounded-full bg-gradient-to-br from-[#902F9B] to-[#FD437D] flex items-center justify-center border-4 border-[#FFE573] shadow-2xl cursor-pointer" onClick={generateGoddess}>
+              <p className="text-white text-sm">Click to manifest goddess</p>
             </div>
           )}
         </div>
 
         <div className="max-w-2xl bg-white/10 backdrop-blur-2xl rounded-3xl p-8 border border-white/20 shadow-2xl mb-8">
-          <p className="text-2xl text-white/90 text-center leading-relaxed italic">
-            "{wisdomText || 'The \'āina speaks through the phases of Mahina. Listen to her rhythm, and abundance will follow.'}"
-          </p>
+          <p className="text-2xl text-white/90 text-center leading-relaxed italic">"{wisdomText}"</p>
           <p className="text-center text-[#FFE573] mt-4 font-semibold">— Leila, Guardian of the \'Āina</p>
         </div>
 
-        <div className="mt-8 flex gap-4">
-          <a href="/debug" className="px-6 py-3 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-lg hover:bg-white/20 transition-all">
+        <div className="flex gap-4">
+          <a href="/debug" className="px-6 py-3 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-lg hover:bg-white/20">
             🔧 Debug Dashboard
           </a>
+          {!designFeedback && (
+            <button
+              onClick={analyzeDesign}
+              className="px-6 py-3 bg-gradient-to-r from-[#902F9B] to-[#FD437D] text-white rounded-lg font-bold flex items-center gap-2"
+            >
+              <Eye className="w-5 h-5" />
+              Get AI Design Feedback
+            </button>
+          )}
         </div>
       </div>
     </div>
