@@ -137,19 +137,19 @@ export default function CelestialAltar() {
       <div className="fixed top-4 right-4 z-50">
         <div className="relative">
           {/* Speech Bubble */}
-          <div className="absolute bottom-full right-0 mb-4 w-96 bg-white/95 backdrop-blur-xl rounded-2xl p-4 shadow-2xl border-4 border-[#FFE573]">
+          <div className="absolute bottom-full right-0 mb-4 w-[28rem] bg-white/95 backdrop-blur-xl rounded-2xl p-4 shadow-2xl border-4 border-[#FFE573]">
             <p className="text-gray-900 font-semibold text-lg">{speech}</p>
             <div className="absolute -bottom-2 right-8 w-4 h-4 bg-white rotate-45 border-r-4 border-b-4 border-[#FFE573]"></div>
           </div>
 
           {/* Goddess Avatar */}
           {goddessImage ? (
-            <div className={`w-32 h-32 rounded-full overflow-hidden border-4 border-[#FFE573] shadow-2xl ${emotionStyles[goddessEmotion]} transition-all cursor-pointer`}
+            <div className={`w-48 h-48 rounded-full overflow-hidden border-4 border-[#FFE573] shadow-2xl ${emotionStyles[goddessEmotion]} transition-all cursor-pointer`}
                  onClick={generateGoddess}>
               <img src={goddessImage} alt="Leila" className="w-full h-full object-cover" />
             </div>
           ) : (
-            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#902F9B] to-[#FD437D] flex items-center justify-center border-4 border-[#FFE573] cursor-pointer"
+            <div className="w-48 h-48 rounded-full bg-gradient-to-br from-[#902F9B] to-[#FD437D] flex items-center justify-center border-4 border-[#FFE573] cursor-pointer"
                  onClick={generateGoddess}>
               {loading ? (
                 <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
