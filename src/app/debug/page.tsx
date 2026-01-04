@@ -2,7 +2,8 @@
 import { useState, useEffect } from 'react';
 import ExpertPanel from '@/components/ExpertPanel';
 import ExpertPanelV2 from '@/components/ExpertPanelV2';
-import { Brain, Rocket, Lock, ThumbsUp, ThumbsDown, RefreshCw, Sparkles } from 'lucide-react';
+import MobileTester from '@/components/MobileTester';
+import { Brain, Rocket, Lock, ThumbsUp, ThumbsDown, RefreshCw, Sparkles, Smartphone } from 'lucide-react';
 
 export default function DebugPage() {
   const [authenticated, setAuthenticated] = useState(false);
@@ -10,6 +11,7 @@ export default function DebugPage() {
   const [error, setError] = useState('');
   const [showV1, setShowV1] = useState(false);
   const [showV2, setShowV2] = useState(false);
+  const [showMobile, setShowMobile] = useState(false);
   const [leilaImg, setLeilaImg] = useState('');
   const [loading, setLoading] = useState(false);
   const [ratings, setRatings] = useState<any[]>([]);
@@ -17,7 +19,6 @@ export default function DebugPage() {
   const [showNotes, setShowNotes] = useState(false);
   const [pendingRating, setPendingRating] = useState<'up' | 'down' | null>(null);
   const [improvedPrompt, setImprovedPrompt] = useState('');
-  const [generateStatus, setGenerateStatus] = useState('');
 
   useEffect(() => {
     if (localStorage.getItem('debug_auth') === 'CB') {
@@ -44,17 +45,11 @@ export default function DebugPage() {
   };
 
   const generate = async () => {
-    console.log('🎨 Starting generation...');
     setLoading(true);
-    setGenerateStatus('Generating Leila...');
-    
     try {
       const endpoint = improvedPrompt 
         ? '/api/generate-leila-smart'
         : '/api/generate-goddess';
-      
-      console.log('📡 Calling API:', endpoint);
-      setGenerateStatus(improvedPrompt ? 'Using AI-improved prompt...' : 'Creating new Leila...');
       
       const res = await fetch(endpoint, { 
         method: 'POST',
@@ -65,29 +60,15 @@ export default function DebugPage() {
         })
       });
       
-      console.log('📥 Response status:', res.status);
       const data = await res.json();
-      console.log('📦 Response data:', data);
-      
-      if (data.success && data.imageUrl) {
+      if (data.success) {
         setLeilaImg(data.imageUrl);
-        setGenerateStatus('✅ Leila created!');
-        console.log('✅ Image loaded:', data.imageUrl);
-        
         if (data.promptUsed) {
           setImprovedPrompt(data.promptUsed);
         }
-        
-        setTimeout(() => setGenerateStatus(''), 2000);
       } else {
-        setGenerateStatus('❌ Generation failed');
-        console.error('Failed:', data);
-        alert('Generation failed: ' + (data.error || 'Unknown error'));
+        alert('Generation failed: ' + (data.error || 'Check OpenAI credits'));
       }
-    } catch (err) {
-      console.error('❌ Error:', err);
-      setGenerateStatus('❌ Error occurred');
-      alert('Error generating: ' + err);
     } finally {
       setLoading(false);
     }
@@ -111,14 +92,12 @@ export default function DebugPage() {
     const updated = [...ratings, newRating];
     setRatings(updated);
     localStorage.setItem('leila_ratings', JSON.stringify(updated));
-    
-    console.log('💾 Saved to localStorage:', newRating);
 
     if (notes.trim()) {
       await analyzeAndImprovePrompt(updated);
     }
 
-    alert(pendingRating === 'up' ? '👍 Saved to localStorage!' : '👎 Saved to localStorage!');
+    alert(pendingRating === 'up' ? '👍 Saved!' : '👎 Saved!');
     
     setNotes('');
     setShowNotes(false);
@@ -127,7 +106,6 @@ export default function DebugPage() {
 
   const analyzeAndImprovePrompt = async (allRatings: any[]) => {
     try {
-      console.log('🧠 Analyzing feedback...');
       const res = await fetch('/api/analyze-leila-feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -137,7 +115,6 @@ export default function DebugPage() {
       const data = await res.json();
       if (data.success && data.improvedPrompt) {
         setImprovedPrompt(data.improvedPrompt);
-        console.log('✨ Prompt improved!');
       }
     } catch (error) {
       console.error('Error analyzing:', error);
@@ -186,11 +163,17 @@ export default function DebugPage() {
           </div>
         </div>
 
-        <div className="bg-blue-900/40 border-2 border-blue-500/40 rounded-xl p-4 mb-6">
-          <p className="text-blue-400 font-bold mb-2">💾 Storage: localStorage (Browser Only)</p>
-          <p className="text-white/80 text-sm">Images saved to your browser. Not in database yet. Total: {ratings.length} ratings</p>
-        </div>
+        {/* MOBILE TESTER */}
+        <button 
+          onClick={() => setShowMobile(!showMobile)} 
+          className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 rounded-xl font-bold mb-4 flex items-center justify-center gap-3"
+        >
+          <Smartphone className="w-8 h-8" />
+          {showMobile ? 'HIDE' : 'SHOW'} MOBILE TESTER
+        </button>
+        {showMobile && <div className="mb-6"><MobileTester /></div>}
 
+        {/* LEILA TESTER */}
         <div className="bg-purple-900/40 rounded-2xl p-6 mb-6 border-2 border-purple-500/40">
           <div className="flex items-center gap-3 mb-4">
             <h2 className="text-2xl font-bold text-purple-400">👑 Leila Tester</h2>
@@ -209,24 +192,18 @@ export default function DebugPage() {
                   <img src={leilaImg} className="w-full h-80 object-cover rounded-lg" alt="Leila" />
                 ) : (
                   <div className="w-full h-80 bg-gray-800 rounded-lg flex items-center justify-center">
-                    <p className="text-white/40 text-center px-4">Click Generate Button Below ⬇️</p>
+                    <p className="text-white/40">Click Generate</p>
                   </div>
                 )}
               </div>
               
-              {generateStatus && (
-                <div className="bg-blue-900/40 p-3 rounded-lg mb-3 text-center border-2 border-blue-500/40">
-                  <p className="text-blue-400 font-bold text-lg">{generateStatus}</p>
-                </div>
-              )}
-              
               <button
                 onClick={generate}
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-xl font-bold mb-3 flex items-center justify-center gap-2 hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed text-lg shadow-lg"
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-xl font-bold mb-3 flex items-center justify-center gap-2"
               >
-                <RefreshCw className={`w-6 h-6 ${loading ? 'animate-spin' : ''}`} />
-                {loading ? '⏳ Generating...' : improvedPrompt ? '🎨 Generate (AI Improved)' : '�� Generate New Leila'}
+                <RefreshCw className={loading ? 'animate-spin' : ''} />
+                {loading ? 'Generating...' : improvedPrompt ? 'Generate (AI Improved)' : 'Generate New'}
               </button>
               
               {leilaImg && !showNotes && (
@@ -255,14 +232,14 @@ export default function DebugPage() {
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     className="w-full bg-white/20 text-white p-3 rounded-lg mb-3 min-h-24"
-                    placeholder="e.g., 'Love the hair and eyes, but face is too angular. Want softer features and warmer smile.'"
+                    placeholder="e.g., 'Love the hair and eyes, but face is too angular.'"
                   />
                   <div className="flex gap-3">
                     <button
                       onClick={submitRating}
-                      className="flex-1 bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700"
+                      className="flex-1 bg-green-600 text-white py-2 rounded-lg font-bold"
                     >
-                      ✅ Save to localStorage
+                      ✅ Submit
                     </button>
                     <button
                       onClick={() => {
@@ -270,23 +247,20 @@ export default function DebugPage() {
                         setPendingRating(null);
                         setNotes('');
                       }}
-                      className="flex-1 bg-gray-600 text-white py-2 rounded-lg font-bold hover:bg-gray-700"
+                      className="flex-1 bg-gray-600 text-white py-2 rounded-lg font-bold"
                     >
                       Cancel
                     </button>
                   </div>
-                  <p className="text-white/60 text-xs mt-2">
-                    💡 AI will analyze your notes and improve future generations!
-                  </p>
                 </div>
               )}
             </div>
             
             <div className="bg-white/10 rounded-xl p-4">
-              <h3 className="text-xl font-bold text-white mb-4">📊 Ratings & Notes</h3>
+              <h3 className="text-xl font-bold text-white mb-4">📊 Ratings</h3>
               <div className="space-y-2 max-h-80 overflow-y-auto mb-4">
                 {ratings.length === 0 ? (
-                  <p className="text-white/60">No ratings yet. Generate and rate Leilas!</p>
+                  <p className="text-white/60">No ratings yet</p>
                 ) : (
                   ratings.slice().reverse().map((r, i) => (
                     <div key={i} className="bg-white/5 p-3 rounded">
@@ -305,9 +279,8 @@ export default function DebugPage() {
               </div>
               <div className="bg-blue-900/40 p-3 rounded">
                 <p className="text-white font-bold">Total: {ratings.length}</p>
-                <p className="text-green-400">👍 Likes: {ratings.filter(r => r.rating === 'up').length}</p>
-                <p className="text-red-400">👎 Dislikes: {ratings.filter(r => r.rating === 'down').length}</p>
-                <p className="text-yellow-400">📝 With Notes: {ratings.filter(r => r.notes).length}</p>
+                <p className="text-green-400">👍 {ratings.filter(r => r.rating === 'up').length}</p>
+                <p className="text-red-400">👎 {ratings.filter(r => r.rating === 'down').length}</p>
               </div>
             </div>
           </div>
@@ -326,10 +299,10 @@ export default function DebugPage() {
         <div className="bg-white/10 p-6 rounded-xl">
           <h3 className="text-2xl font-bold text-white mb-4">🧪 Test Tools</h3>
           <div className="grid grid-cols-4 gap-4">
-            <a href="/test-crops" className="bg-green-600 text-white py-4 rounded-xl font-bold text-center hover:bg-green-700">🌱 Crops</a>
-            <a href="/choose-leila" className="bg-purple-600 text-white py-4 rounded-xl font-bold text-center hover:bg-purple-700">👑 Choose</a>
-            <a href="/api/test-connection" className="bg-yellow-600 text-white py-4 rounded-xl font-bold text-center hover:bg-yellow-700">🔌 APIs</a>
-            <a href="/dashboard" className="bg-blue-600 text-white py-4 rounded-xl font-bold text-center hover:bg-blue-700">📊 Dashboard</a>
+            <a href="/test-crops" className="bg-green-600 text-white py-4 rounded-xl font-bold text-center">🌱 Crops</a>
+            <a href="/choose-leila" className="bg-purple-600 text-white py-4 rounded-xl font-bold text-center">👑 Choose</a>
+            <a href="/api/test-connection" className="bg-yellow-600 text-white py-4 rounded-xl font-bold text-center">🔌 APIs</a>
+            <a href="/dashboard" className="bg-blue-600 text-white py-4 rounded-xl font-bold text-center">📊 Dashboard</a>
           </div>
         </div>
       </div>
