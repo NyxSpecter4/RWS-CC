@@ -2,24 +2,34 @@
 
 interface LeilaGoddessProps {
   isSpeaking?: boolean;
-  size?: number;
+  size?: 'sm' | 'md' | 'lg' | number;
+  pulseColor?: string;
   showMana?: boolean;
 }
 
 export default function LeilaGoddess({ 
   isSpeaking = false, 
-  size = 200,
+  size = 'md',
+  pulseColor = 'from-[#FFE573]/40 via-[#FD437D]/30 to-[#902F9B]/40',
   showMana = true 
 }: LeilaGoddessProps) {
+  const sizeMap = {
+    sm: 120,
+    md: 200,
+    lg: 300
+  };
+  
+  const actualSize = typeof size === 'number' ? size : sizeMap[size];
+  
   return (
-    <div className="relative" style={{ width: size, height: size }}>
+    <div className="relative" style={{ width: actualSize, height: actualSize }}>
       {isSpeaking && (
         <div className="absolute inset-0 animate-pulse">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#FFE573]/30 via-[#FD437D]/20 to-[#902F9B]/30 rounded-full blur-2xl" />
+          <div className={`absolute inset-0 bg-gradient-to-r ${pulseColor} rounded-full blur-2xl`} />
         </div>
       )}
       
-      <svg width={size} height={size} viewBox="0 0 300 300" className="relative z-10">
+      <svg width={actualSize} height={actualSize} viewBox="0 0 300 300" className="relative z-10">
         <defs>
           <filter id="goddess-aura">
             <feGaussianBlur stdDeviation="3" />
