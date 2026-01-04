@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import ExpertPanel from '@/components/ExpertPanel';
 import ExpertPanelV2 from '@/components/ExpertPanelV2';
-import { Brain, Rocket, Lock, ThumbsUp, ThumbsDown, RefreshCw } from 'lucide-react';
+import { Brain, Rocket, Lock, ThumbsUp, ThumbsDown, RefreshCw, Sparkles } from 'lucide-react';
 
 export default function DebugPage() {
   const [authenticated, setAuthenticated] = useState(false);
@@ -13,6 +13,10 @@ export default function DebugPage() {
   const [leilaImg, setLeilaImg] = useState('');
   const [loading, setLoading] = useState(false);
   const [ratings, setRatings] = useState<any[]>([]);
+  const [notes, setNotes] = useState('');
+  const [showNotes, setShowNotes] = useState(false);
+  const [pendingRating, setPendingRating] = useState<'up' | 'down' | null>(null);
+  const [improvedPrompt, setImprovedPrompt] = useState('');
 
   useEffect(() => {
     if (localStorage.getItem('debug_auth') === 'CB') {
@@ -41,21 +45,79 @@ export default function DebugPage() {
   const generate = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/generate-goddess', { method: 'POST' });
+      // If we have an improved prompt, use it
+      const endpoint = improvedPrompt 
+        ? '/api/generate-leila-smart'
+        : '/api/generate-goddess';
+      
+      const res = await fetch(endpoint, { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          improvedPrompt: improvedPrompt || undefined,
+          previousRatings: ratings.slice(-5) // Send last 5 ratings for context
+        })
+      });
+      
       const data = await res.json();
-      if (data.success) setLeilaImg(data.imageUrl);
+      if (data.success) {
+        setLeilaImg(data.imageUrl);
+        if (data.promptUsed) {
+          setImprovedPrompt(data.promptUsed);
+        }
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const rate = (r: 'up' | 'down') => {
-    if (!leilaImg) return;
-    const newRating = { url: leilaImg, rating: r, time: new Date().toISOString() };
+  const startRating = (r: 'up' | 'down') => {
+    setPendingRating(r);
+    setShowNotes(true);
+  };
+
+  const submitRating = async () => {
+    if (!leilaImg || !pendingRating) return;
+
+    const newRating = { 
+      url: leilaImg, 
+      rating: pendingRating, 
+      notes: notes.trim(),
+      time: new Date().toISOString() 
+    };
+    
     const updated = [...ratings, newRating];
     setRatings(updated);
     localStorage.setItem('leila_ratings', JSON.stringify(updated));
-    alert(r === 'up' ? '👍 Liked!' : '👎 Disliked!');
+
+    // If user provided notes, analyze and improve the prompt
+    if (notes.trim()) {
+      await analyzeAndImprovePrompt(updated);
+    }
+
+    alert(pendingRating === 'up' ? '👍 Saved! AI learning your preferences...' : '👎 Saved! AI will avoid this style...');
+    
+    setNotes('');
+    setShowNotes(false);
+    setPendingRating(null);
+  };
+
+  const analyzeAndImprovePrompt = async (allRatings: any[]) => {
+    try {
+      const res = await fetch('/api/analyze-leila-feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ratings: allRatings })
+      });
+
+      const data = await res.json();
+      if (data.success && data.improvedPrompt) {
+        setImprovedPrompt(data.improvedPrompt);
+        console.log('✨ Prompt improved based on your feedback!');
+      }
+    } catch (error) {
+      console.error('Error analyzing feedback:', error);
+    }
   };
 
   if (!authenticated) {
@@ -101,7 +163,15 @@ export default function DebugPage() {
         </div>
 
         <div className="bg-purple-900/40 rounded-2xl p-6 mb-6 border-2 border-purple-500/40">
-          <h2 className="text-2xl font-bold text-purple-400 mb-4">👑 Leila Tester</h2>
+          <div className="flex items-center gap-3 mb-4">
+            <h2 className="text-2xl font-bold text-purple-400">👑 Leila Tester</h2>
+            {improvedPrompt && (
+              <div className="flex items-center gap-2 bg-green-900/40 px-3 py-1 rounded-full">
+                <Sparkles className="w-4 h-4 text-green-400" />
+                <span className="text-green-400 text-sm font-bold">AI Learning Active</span>
+              </div>
+            )}
+          </div>
           
           <div className="grid md:grid-cols-2 gap-6">
             <div>
@@ -121,39 +191,88 @@ export default function DebugPage() {
                 className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-xl font-bold mb-3 flex items-center justify-center gap-2"
               >
                 <RefreshCw className={loading ? 'animate-spin' : ''} />
-                {loading ? 'Generating...' : 'Generate New'}
+                {loading ? 'Generating...' : improvedPrompt ? 'Generate (AI Improved)' : 'Generate New'}
               </button>
               
-              {leilaImg && (
+              {leilaImg && !showNotes && (
                 <div className="grid grid-cols-2 gap-3">
-                  <button onClick={() => rate('up')} className="bg-green-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2">
+                  <button 
+                    onClick={() => startRating('up')} 
+                    className="bg-green-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-700"
+                  >
                     <ThumbsUp /> Like
                   </button>
-                  <button onClick={() => rate('down')} className="bg-red-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2">
+                  <button 
+                    onClick={() => startRating('down')} 
+                    className="bg-red-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-red-700"
+                  >
                     <ThumbsDown /> Dislike
                   </button>
+                </div>
+              )}
+
+              {showNotes && (
+                <div className="bg-white/10 rounded-xl p-4 border-2 border-yellow-500/40">
+                  <p className="text-yellow-400 font-bold mb-3">
+                    {pendingRating === 'up' ? '👍 What do you LIKE?' : '👎 What do you DISLIKE?'}
+                  </p>
+                  <textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    className="w-full bg-white/20 text-white p-3 rounded-lg mb-3 min-h-24"
+                    placeholder="e.g., 'Love the hair and eyes, but face is too angular. Want softer features and warmer smile.'"
+                  />
+                  <div className="flex gap-3">
+                    <button
+                      onClick={submitRating}
+                      className="flex-1 bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700"
+                    >
+                      ✅ Submit & Learn
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowNotes(false);
+                        setPendingRating(null);
+                        setNotes('');
+                      }}
+                      className="flex-1 bg-gray-600 text-white py-2 rounded-lg font-bold hover:bg-gray-700"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                  <p className="text-white/60 text-xs mt-2">
+                    💡 AI will analyze your notes and improve future generations!
+                  </p>
                 </div>
               )}
             </div>
             
             <div className="bg-white/10 rounded-xl p-4">
-              <h3 className="text-xl font-bold text-white mb-4">📊 Ratings</h3>
+              <h3 className="text-xl font-bold text-white mb-4">📊 Ratings & Notes</h3>
               <div className="space-y-2 max-h-80 overflow-y-auto mb-4">
                 {ratings.length === 0 ? (
                   <p className="text-white/60">No ratings yet</p>
                 ) : (
                   ratings.slice().reverse().map((r, i) => (
-                    <div key={i} className="bg-white/5 p-3 rounded flex items-center gap-2">
-                      {r.rating === 'up' ? <ThumbsUp className="text-green-400" /> : <ThumbsDown className="text-red-400" />}
-                      <p className="text-white/80 text-sm">{new Date(r.time).toLocaleString()}</p>
+                    <div key={i} className="bg-white/5 p-3 rounded">
+                      <div className="flex items-center gap-2 mb-2">
+                        {r.rating === 'up' ? <ThumbsUp className="text-green-400 w-5 h-5" /> : <ThumbsDown className="text-red-400 w-5 h-5" />}
+                        <p className="text-white/80 text-sm">{new Date(r.time).toLocaleString()}</p>
+                      </div>
+                      {r.notes && (
+                        <p className="text-white/70 text-sm italic bg-white/5 p-2 rounded">
+                          "{r.notes}"
+                        </p>
+                      )}
                     </div>
                   ))
                 )}
               </div>
               <div className="bg-blue-900/40 p-3 rounded">
-                <p className="text-white">Total: {ratings.length}</p>
-                <p className="text-green-400">👍 {ratings.filter(r => r.rating === 'up').length}</p>
-                <p className="text-red-400">👎 {ratings.filter(r => r.rating === 'down').length}</p>
+                <p className="text-white font-bold">Total: {ratings.length}</p>
+                <p className="text-green-400">👍 Likes: {ratings.filter(r => r.rating === 'up').length}</p>
+                <p className="text-red-400">👎 Dislikes: {ratings.filter(r => r.rating === 'down').length}</p>
+                <p className="text-yellow-400">📝 With Notes: {ratings.filter(r => r.notes).length}</p>
               </div>
             </div>
           </div>
