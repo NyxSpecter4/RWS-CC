@@ -1,9 +1,9 @@
 "use client";
 import { useState, useEffect } from 'react';
+import ExpertPanel from '@/components/ExpertPanel';
 import SoilHealthTracker from '@/components/SoilHealthTracker';
 import SmartSensorAlerts from '@/components/SmartSensorAlerts';
 import MarketIntelligence from '@/components/MarketIntelligence';
-import ExpertPanel from '@/components/ExpertPanel';
 import { Brain } from 'lucide-react';
 
 export default function UltimateDebugDashboard() {
@@ -24,6 +24,7 @@ export default function UltimateDebugDashboard() {
         <p className="text-white/60">DeepSeek Research Compendium • Hawaiian Farm Management System</p>
       </div>
 
+      {/* EXPERT PANEL BUTTON */}
       <button
         onClick={() => setShowExperts(!showExperts)}
         className="mb-8 w-full px-8 py-6 bg-gradient-to-r from-[#902F9B] to-[#FD437D] text-white rounded-2xl font-bold text-2xl hover:scale-105 transition-all shadow-2xl flex items-center justify-center gap-4"
@@ -34,6 +35,22 @@ export default function UltimateDebugDashboard() {
 
       {showExperts && <ExpertPanel />}
 
+      {/* MARKET INTELLIGENCE */}
+      <div className="mb-8">
+        <MarketIntelligence />
+      </div>
+
+      {/* SMART SENSOR ALERTS */}
+      <div className="mb-8">
+        <SmartSensorAlerts />
+      </div>
+
+      {/* SOIL HEALTH TRACKER */}
+      <div className="mb-8">
+        <SoilHealthTracker />
+      </div>
+
+      {/* API STATUS */}
       <div className="grid grid-cols-4 gap-4 mb-8">
         <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
           <p className="text-xs text-white/60 mb-1">API Status</p>
@@ -43,40 +60,12 @@ export default function UltimateDebugDashboard() {
         </div>
       </div>
 
-      <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-        <h2 className="text-2xl font-bold text-[#FFE573] mb-4">📍 All DeepSeek Data Loaded</h2>
-        <p className="text-white/80">Click button above to see expert analysis!</p>
-      </div>
-
+      {/* HOME LINK */}
       <div className="mt-8">
-        <a href="/" className="px-8 py-4 bg-gradient-to-r from-[#902F9B] to-[#FD437D] text-white rounded-xl font-bold">
+        <a href="/" className="px-8 py-4 bg-gradient-to-r from-[#902F9B] to-[#FD437D] text-white rounded-xl font-bold hover:scale-105 transition-all inline-block">
           🏝️ Home Page
         </a>
       </div>
     </div>
   );
 }
-
-      {/* SOIL HEALTH TAB */}
-      <div className="mb-8">
-        <button
-          onClick={() => setShowExperts(false)}
-          className="px-8 py-4 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-xl font-bold text-xl hover:scale-105 transition-all shadow-xl"
-        >
-          🌱 Dr. Radovich's Soil Health Tracker
-        </button>
-      </div>
-
-      <SoilHealthTracker />
-
-      {/* SMART SENSOR ALERTS */}
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-cyan-400 mb-4">📡 AgTech IoT - Smart Sensor Intelligence</h2>
-        <SmartSensorAlerts />
-      </div>
-
-      {/* MARKET INTELLIGENCE */}
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-green-400 mb-4">📊 Market Intelligence & Buyer Tracking</h2>
-        <MarketIntelligence />
-      </div>
