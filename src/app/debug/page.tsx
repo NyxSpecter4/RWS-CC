@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
+import SoilHealthTracker from '@/components/SoilHealthTracker';
 import ExpertPanel from '@/components/ExpertPanel';
 import { Brain } from 'lucide-react';
 
@@ -53,3 +54,15 @@ export default function UltimateDebugDashboard() {
     </div>
   );
 }
+
+      {/* SOIL HEALTH TAB */}
+      <div className="mb-8">
+        <button
+          onClick={() => setShowExperts(false)}
+          className="px-8 py-4 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-xl font-bold text-xl hover:scale-105 transition-all shadow-xl"
+        >
+          🌱 Dr. Radovich's Soil Health Tracker
+        </button>
+      </div>
+
+      <SoilHealthTracker />
