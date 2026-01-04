@@ -14,7 +14,6 @@ export default function CelestialAltar() {
     else if (day <= 21) setCurrentPhase('Akua');
     else setCurrentPhase('Muku');
 
-    // AUTO GENERATE on first load
     generateGoddess();
     getSmartGuidance();
   }, []);
@@ -63,10 +62,62 @@ export default function CelestialAltar() {
     Muku: { hawaiian: 'Muku', metaphor: 'Ka Nalo (The Draining Bowl)', color: '#6B21A8' }
   };
 
+  const farmPlan = {
+    currentYear: 1,
+    status: 'Establishment Phase - Planting in Progress',
+    currentRevenue: '$0/month',
+    crops: [
+      {
+        name: 'Māmaki Tea',
+        emoji: '🌿',
+        allocation: '0.3 acres',
+        plants: '60 plants',
+        status: 'Not yet planted',
+        year1: '$0',
+        year2: '$200/mo',
+        year3: '$500/mo',
+        maturity: '18-24 months to first harvest'
+      },
+      {
+        name: 'Finger Limes',
+        emoji: '🍋',
+        allocation: '0.25 acres',
+        plants: '25 trees',
+        status: 'Not yet planted',
+        year1: '$0',
+        year2: '$0',
+        year3: '$300/mo',
+        maturity: '3-4 years to production (seasonal)'
+      },
+      {
+        name: 'Vanilla Beans',
+        emoji: '🌺',
+        allocation: '0.25 acres',
+        plants: '80 vines',
+        status: 'Not yet planted',
+        year1: '$0',
+        year2: '$0',
+        year3: '$400/mo',
+        maturity: '3 years minimum, hand-pollinated, 6mo cure time'
+      },
+      {
+        name: 'Fresh Ginger',
+        emoji: '🫚',
+        allocation: '0.2 acres',
+        plants: 'Dense bed',
+        status: 'Not yet planted',
+        year1: '$0',
+        year2: '$250/mo',
+        year3: '$400/mo',
+        maturity: '8-10 months to first harvest'
+      }
+    ]
+  };
+
   const current = phaseData[currentPhase];
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-[#0a0820]">
+    <div className="min-h-screen relative overflow-hidden bg-[#0a0820] pb-24 md:pb-8">
       
       {/* SKY */}
       <div className="absolute inset-0">
@@ -93,10 +144,10 @@ export default function CelestialAltar() {
         </svg>
       </div>
 
-      {/* LEILA */}
-      <div className="fixed top-6 right-6 z-50">
+      {/* LEILA - RESPONSIVE */}
+      <div className="fixed top-4 right-4 md:top-6 md:right-6 z-50">
         <div className="relative">
-          <div className="relative w-44 h-44">
+          <div className="relative w-32 h-32 md:w-44 md:h-44">
             <svg className="absolute inset-0 w-full h-full" viewBox="0 0 176 176">
               <defs>
                 <linearGradient id="kapaGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -117,30 +168,30 @@ export default function CelestialAltar() {
               <div className="absolute inset-3 rounded-full bg-gradient-to-br from-[#902F9B] to-[#FD437D] flex items-center justify-center cursor-pointer shadow-2xl"
                    onClick={generateGoddess}>
                 {loading ? (
-                  <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-8 h-8 md:w-12 md:h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
                 ) : (
-                  <div className="text-center px-4">
-                    <p className="text-white font-bold">Loading...</p>
+                  <div className="text-center px-2">
+                    <p className="text-white font-bold text-xs md:text-sm">Loading...</p>
                   </div>
                 )}
               </div>
             )}
           </div>
 
-          <div className="absolute top-full right-0 mt-4 w-[28rem] bg-white/98 backdrop-blur-xl rounded-2xl p-5 shadow-2xl border-4 border-[#FFE573]">
-            <div className="flex items-center gap-2 mb-3">
+          <div className="absolute top-full right-0 mt-3 w-72 md:w-[28rem] bg-white/98 backdrop-blur-xl rounded-2xl p-4 md:p-5 shadow-2xl border-4 border-[#FFE573]">
+            <div className="flex items-center gap-2 mb-2">
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
               <span className="text-xs font-black text-purple-700 uppercase">AI LIVE ANALYSIS</span>
             </div>
-            <p className="text-gray-900 font-semibold text-base leading-relaxed mb-3">{speech}</p>
+            <p className="text-gray-900 font-semibold text-sm md:text-base leading-relaxed mb-2">{speech}</p>
             <button onClick={getSmartGuidance} className="text-xs text-purple-600 font-bold hover:text-purple-800">↻ Refresh</button>
           </div>
         </div>
       </div>
 
-      {/* MOON */}
-      <div className="relative z-10 flex flex-col items-center pt-16">
-        <svg width="380" height="380" viewBox="0 0 380 380" className="filter drop-shadow-[0_0_100px_rgba(255,229,115,0.8)]">
+      {/* MOON - RESPONSIVE */}
+      <div className="relative z-10 flex flex-col items-center pt-8 md:pt-16">
+        <svg width="280" height="280" viewBox="0 0 380 380" className="md:w-[380px] md:h-[380px] filter drop-shadow-[0_0_100px_rgba(255,229,115,0.8)]">
           <defs>
             <radialGradient id="moonGrad">
               <stop offset="0%" stopColor="#fef9e7" />
@@ -150,35 +201,43 @@ export default function CelestialAltar() {
           <circle cx="190" cy="190" r="170" fill="url(#moonGrad)" />
         </svg>
         
-        <div className="mt-6 text-center">
-          <h2 className="text-6xl font-black drop-shadow-lg" style={{ color: current.color }}>
+        <div className="mt-4 md:mt-6 text-center px-4">
+          <h2 className="text-4xl md:text-6xl font-black drop-shadow-lg" style={{ color: current.color }}>
             {current.hawaiian}
           </h2>
-          <p className="text-xl font-bold text-white/90 mt-1 drop-shadow-md">{current.metaphor}</p>
+          <p className="text-base md:text-xl font-bold text-white/90 mt-1 drop-shadow-md">{current.metaphor}</p>
         </div>
       </div>
 
-      {/* CROPS */}
-      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex gap-4">
-        <div className="bg-green-900/40 p-4 rounded-xl border-2 border-green-500/40">
-          <div className="text-4xl mb-2">🌿</div>
-          <p className="text-white text-sm font-bold">Māmaki</p>
-        </div>
-        <div className="bg-yellow-900/40 p-4 rounded-xl border-2 border-yellow-500/40">
-          <div className="text-4xl mb-2">🍋</div>
-          <p className="text-white text-sm font-bold">Finger Limes</p>
-        </div>
-        <div className="bg-purple-900/40 p-4 rounded-xl border-2 border-purple-500/40">
-          <div className="text-4xl mb-2">🌺</div>
-          <p className="text-white text-sm font-bold">Vanilla</p>
-        </div>
-        <div className="bg-orange-900/40 p-4 rounded-xl border-2 border-orange-500/40">
-          <div className="text-4xl mb-2">🫚</div>
-          <p className="text-white text-sm font-bold">Ginger</p>
+      {/* REALISTIC FARM PLAN - MOBILE RESPONSIVE WITH PROPER SPACING */}
+      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/95 to-transparent p-3 md:p-4 backdrop-blur-sm z-40 max-h-[40vh] md:max-h-none overflow-y-auto">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-2 md:mb-3">
+            <p className="text-white font-bold text-sm md:text-lg">🌱 1-Acre Regenerative Farm Plan</p>
+            <p className="text-yellow-400 font-black text-lg md:text-2xl">{farmPlan.currentRevenue}</p>
+            <p className="text-white/60 text-xs">{farmPlan.status}</p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mb-16 md:mb-0">
+            {farmPlan.crops.map((crop) => (
+              <div key={crop.name} className="bg-white/10 backdrop-blur-md rounded-lg md:rounded-xl p-2 md:p-3 border-2 border-white/20">
+                <div className="text-3xl md:text-4xl mb-1 md:mb-2 text-center">{crop.emoji}</div>
+                <h4 className="font-bold text-white text-center text-xs md:text-sm mb-1">{crop.name}</h4>
+                <p className="text-xs text-white/60 text-center mb-1">{crop.allocation}</p>
+                <p className="text-xs text-orange-400 font-bold text-center mb-1">{crop.status}</p>
+                <div className="text-[10px] md:text-xs text-white/50 text-center space-y-0.5">
+                  <p>Y1: {crop.year1}</p>
+                  <p>Y2: {crop.year2}</p>
+                  <p>Y3+: {crop.year3}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      <a href="/debug" className="fixed bottom-4 left-4 px-6 py-3 bg-gradient-to-r from-[#902F9B] to-[#FD437D] text-white rounded-xl font-bold hover:scale-105 transition-all z-50 shadow-2xl">
+      {/* DASHBOARD LINK - RESPONSIVE */}
+      <a href="/debug" className="fixed bottom-3 left-3 md:bottom-4 md:left-4 px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-[#902F9B] to-[#FD437D] text-white rounded-xl font-bold hover:scale-105 transition-all z-50 shadow-2xl text-sm md:text-base">
         🧠 Dashboard
       </a>
 
