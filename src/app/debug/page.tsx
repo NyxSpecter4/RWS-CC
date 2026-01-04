@@ -1,12 +1,89 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ExpertPanel from '@/components/ExpertPanel';
 import ExpertPanelV2 from '@/components/ExpertPanelV2';
-import { Brain, Rocket, Wrench } from 'lucide-react';
+import { Brain, Rocket, Wrench, Lock } from 'lucide-react';
 
 export default function DebugPage() {
   const [showExpertsV1, setShowExpertsV1] = useState(false);
   const [showExpertsV2, setShowExpertsV2] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    // Check if already authenticated
+    const auth = localStorage.getItem('debug_auth');
+    if (auth === 'CB') {
+      setAuthenticated(true);
+    }
+  }, []);
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === 'CB') {
+      localStorage.setItem('debug_auth', 'CB');
+      setAuthenticated(true);
+      setError('');
+    } else {
+      setError('Incorrect password');
+      setPassword('');
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('debug_auth');
+    setAuthenticated(false);
+    setPassword('');
+  };
+
+  if (!authenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#020103] via-[#1a0b2e] to-[#020103] flex items-center justify-center p-4">
+        <div className="max-w-md w-full">
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border-2 border-blue-500/40">
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <Lock className="w-12 h-12 text-blue-400" />
+              <h1 className="text-3xl font-black text-white">DEBUG ACCESS</h1>
+            </div>
+
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <label className="block text-white/80 mb-2 font-bold">Password Required</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-3 bg-white/20 border-2 border-white/30 rounded-xl text-white font-bold text-center text-2xl focus:outline-none focus:border-blue-400"
+                  placeholder="Enter password"
+                  autoFocus
+                />
+              </div>
+
+              {error && (
+                <div className="bg-red-900/40 border-2 border-red-500 rounded-xl p-3">
+                  <p className="text-red-400 font-bold text-center">{error}</p>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold text-xl hover:scale-105 transition-all"
+              >
+                🔓 Unlock Debug
+              </button>
+            </form>
+
+            <div className="mt-6">
+              <a href="/" className="block text-center px-6 py-3 bg-gradient-to-r from-[#902F9B] to-[#FD437D] text-white rounded-xl font-bold hover:scale-105 transition-all">
+                🏝️ Back to Home
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#020103] via-[#1a0b2e] to-[#020103] p-4">
@@ -19,9 +96,17 @@ export default function DebugPage() {
               🔧 DEBUG PAGE
             </h1>
           </div>
-          <a href="/" className="px-6 py-3 bg-gradient-to-r from-[#902F9B] to-[#FD437D] text-white rounded-xl font-bold hover:scale-105 transition-all">
-            🏝️ Home
-          </a>
+          <div className="flex gap-3">
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700"
+            >
+              🔒 Lock
+            </button>
+            <a href="/" className="px-6 py-3 bg-gradient-to-r from-[#902F9B] to-[#FD437D] text-white rounded-xl font-bold hover:scale-105 transition-all">
+              🏝️ Home
+            </a>
+          </div>
         </div>
 
         <div className="bg-blue-900/30 border-2 border-blue-500/40 rounded-xl p-6 mb-6">
