@@ -1,5 +1,4 @@
 "use client";
-import AutoExpertFeedback from '@/components/AutoExpertFeedback';
 import { useState, useEffect } from 'react';
 
 export default function CelestialAltar() {
@@ -75,7 +74,6 @@ export default function CelestialAltar() {
             }}
           />
         ))}
-      <AutoExpertFeedback />
       </div>
 
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-8">
@@ -149,11 +147,8 @@ export default function CelestialAltar() {
                 {phaseData[currentPhase].title}
               </h2>
               <p className="text-white/80 text-xl">JANUARY 4, 2026</p>
-      <AutoExpertFeedback />
             </div>
-      <AutoExpertFeedback />
           </div>
-      <AutoExpertFeedback />
         </div>
 
         {/* GODDESS */}
@@ -169,7 +164,6 @@ export default function CelestialAltar() {
                   e.currentTarget.style.display = 'none';
                 }}
               />
-      <AutoExpertFeedback />
             </div>
           ) : (
             <div 
@@ -179,7 +173,6 @@ export default function CelestialAltar() {
               <div className="text-center p-8">
                 {loading ? (
                   <>
-      <AutoExpertFeedback />
                     <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                     <p className="text-white text-lg font-bold">Manifesting Leila...</p>
                   </>
@@ -189,26 +182,21 @@ export default function CelestialAltar() {
                     <p className="text-white/80">Leila Goddess</p>
                   </>
                 )}
-      <AutoExpertFeedback />
               </div>
-      <AutoExpertFeedback />
             </div>
           )}
-      <AutoExpertFeedback />
         </div>
 
         {/* WISDOM */}
         <div className="max-w-3xl bg-white/10 backdrop-blur-2xl rounded-3xl p-10 border border-white/20 shadow-2xl mb-8">
           <p className="text-3xl text-white/90 text-center leading-relaxed italic">"{wisdomText}"</p>
           <p className="text-center text-[#FFE573] mt-6 font-semibold text-xl">— Leila, Guardian of the \'Āina</p>
-      <AutoExpertFeedback />
         </div>
 
         {/* ACTION */}
         <div className="bg-gradient-to-r from-[#902F9B]/20 to-[#FD437D]/20 backdrop-blur-md rounded-2xl p-8 border border-white/20 mb-8 max-w-2xl">
           <h3 className="text-2xl font-bold text-[#FFE573] mb-4">Today's Mana Guidance</h3>
           <p className="text-white/90 text-xl">{phaseData[currentPhase].action}</p>
-      <AutoExpertFeedback />
         </div>
 
         {/* LINKS */}
@@ -216,9 +204,7 @@ export default function CelestialAltar() {
           <a href="/debug" className="px-8 py-4 bg-gradient-to-r from-[#902F9B] to-[#FD437D] text-white rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-[#FD437D]/50 transition-all">
             🔧 Expert Panel Dashboard
           </a>
-      <AutoExpertFeedback />
         </div>
-      <AutoExpertFeedback />
       </div>
 
       <style jsx>{`
@@ -227,7 +213,6 @@ export default function CelestialAltar() {
           50% { transform: translateY(-20px) rotate(180deg); }
         }
       `}</style>
-      <AutoExpertFeedback />
     </div>
   );
 }
