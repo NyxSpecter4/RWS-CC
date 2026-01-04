@@ -1,0 +1,219 @@
+{
+  "location": {
+    "name": "Hawaiian Acres, Hawaii",
+    "coordinates": { "lat": 19.5428, "lon": -155.0506 },
+    "zone": "USDA Zone 11a-12a",
+    "elevation": "1000-1500 ft",
+    "rainfall": "150-200 inches/year",
+    "soilType": "Volcanic, well-drained"
+  },
+  
+  "crops": {
+    "mamaki": {
+      "name": "Māmaki Tea",
+      "scientificName": "Pipturus albidus",
+      "allocation": "0.25 acres",
+      "plantDensity": "50 plants (4x8ft spacing)",
+      "timeline": {
+        "planting": "Year 1, Month 1-3",
+        "firstHarvest": "18-24 months",
+        "fullProduction": "Year 3"
+      },
+      "revenue": {
+        "year1": "$0",
+        "year2": "$200/month",
+        "year3": "$500/month"
+      },
+      "marketData": {
+        "wholesalePrice": "$185/lb",
+        "trend": "+12.1% vs last week",
+        "demand": "HIGH",
+        "mainBuyer": "Shaka Tea (CLOSED - diversify buyers!)",
+        "challenge": "Act 242 protection helps, but need multiple buyers"
+      },
+      "cultivationAdvice": {
+        "soil": "Well-drained volcanic soil, pH 5.5-6.5",
+        "water": "Moderate, avoid waterlogging",
+        "harvesting": "Pick young leaves before sunrise for highest quality",
+        "diseases": "Watch for root rot in rainy season",
+        "preparation": "Dry leaves in shade, not direct sun",
+        "marketing": "Emphasize 'Hawaii-grown' label (Act 242 protection)"
+      }
+    },
+    
+    "fingerLimes": {
+      "name": "Finger Limes",
+      "scientificName": "Citrus australasica",
+      "allocation": "0.2 acres",
+      "plantDensity": "20 trees (12x12ft spacing)",
+      "timeline": {
+        "planting": "Year 1, Month 1-6",
+        "firstHarvest": "3-4 years",
+        "fullProduction": "Year 5"
+      },
+      "revenue": {
+        "year1": "$0",
+        "year2": "$0",
+        "year3": "$300/month (seasonal)"
+      },
+      "marketData": {
+        "wholesalePrice": "$45/lb",
+        "trend": "+7.4% vs last week",
+        "demand": "HIGH (gourmet market)",
+        "challenge": "Seasonal production, need storage/preservation plan"
+      },
+      "cultivationAdvice": {
+        "soil": "Well-drained, slightly acidic",
+        "water": "Regular during fruiting, reduce in winter",
+        "pruning": "Annual pruning after harvest",
+        "pests": "Watch for citrus leaf miner, Asian citrus psyllid",
+        "harvesting": "Pick when skin changes from green to burgundy/yellow",
+        "preparation": "Contact UH CTAHR for variety recommendations",
+        "marketing": "Target high-end restaurants, farmer's markets"
+      }
+    },
+    
+    "vanilla": {
+      "name": "Vanilla Beans",
+      "scientificName": "Vanilla planifolia",
+      "allocation": "0.2 acres",
+      "plantDensity": "60 vines (6x6ft on trellises)",
+      "timeline": {
+        "planting": "Year 1, Month 1-12",
+        "firstFlower": "2-3 years",
+        "firstHarvest": "3+ years",
+        "fullProduction": "Year 4-5"
+      },
+      "revenue": {
+        "year1": "$0",
+        "year2": "$0",
+        "year3": "$400/month"
+      },
+      "marketData": {
+        "wholesalePrice": "$420/lb cured",
+        "trend": "Stable",
+        "demand": "HIGH (premium market)",
+        "challenge": "EXTREMELY labor-intensive, hand pollination required"
+      },
+      "cultivationAdvice": {
+        "soil": "Rich organic matter, excellent drainage",
+        "water": "High humidity (70-80%), regular water",
+        "support": "Build sturdy trellises before planting",
+        "pollination": "HAND POLLINATE every flower at dawn (critical!)",
+        "curing": "6-month curing process required",
+        "laborNeeds": "Plan for daily pollination during bloom (3-6 months)",
+        "preparation": "Master curing technique or partner with experienced curer",
+        "marketing": "Premium pricing for fresh Hawaiian vanilla"
+      }
+    },
+    
+    "ginger": {
+      "name": "Fresh Ginger",
+      "scientificName": "Zingiber officinale",
+      "allocation": "0.15 acres",
+      "plantDensity": "Dense bed planting",
+      "timeline": {
+        "planting": "Year 1, Month 1-3",
+        "firstHarvest": "8-10 months",
+        "fullProduction": "Year 2"
+      },
+      "revenue": {
+        "year1": "$0",
+        "year2": "$200/month",
+        "year3": "$300/month",
+        "potential": "$60,000-$80,000/acre (you're VERY conservative!)"
+      },
+      "marketData": {
+        "wholesalePrice": "$8/lb fresh",
+        "trend": "-3.2% (seasonal)",
+        "demand": "MODERATE",
+        "challenge": "Competition from cheap Peruvian imports"
+      },
+      "cultivationAdvice": {
+        "CRITICAL": "USE HYDROPONIC/SOILLESS ONLY!",
+        "disease": "Bacterial wilt (Ralstonia solanacearum) makes soil growing IMPOSSIBLE",
+        "method": "Coconut coir grow bags or hydroponic NFT system",
+        "water": "Keep substrate moist, not waterlogged",
+        "harvesting": "Baby ginger at 4-6 months, mature at 8-10 months",
+        "storage": "Can store rhizomes 2-3 months in cool, dry place",
+        "preparation": "Set up soilless system BEFORE planting",
+        "marketing": "Emphasize FRESH, LOCAL, ORGANIC to justify premium over imports"
+      }
+    },
+    
+    "turmeric": {
+      "name": "Turmeric",
+      "scientificName": "Curcuma longa",
+      "allocation": "0.15 acres",
+      "plantDensity": "Dense bed planting",
+      "timeline": {
+        "planting": "Year 1, Month 1-3",
+        "firstHarvest": "8-10 months",
+        "fullProduction": "Year 2"
+      },
+      "revenue": {
+        "year1": "$0",
+        "year2": "$200/month",
+        "year3": "$300/month",
+        "potential": "$60,000-$80,000/acre (you're VERY conservative!)"
+      },
+      "marketData": {
+        "wholesalePrice": "$8/lb fresh",
+        "trend": "-3.2% (seasonal)",
+        "demand": "MODERATE-HIGH",
+        "challenge": "Massive imports from Fiji and India"
+      },
+      "cultivationAdvice": {
+        "CRITICAL": "USE HYDROPONIC/SOILLESS ONLY!",
+        "disease": "Same bacterial wilt risk as ginger",
+        "method": "Coconut coir grow bags or hydroponic system",
+        "water": "Regular moisture during growth, reduce before harvest",
+        "harvesting": "When leaves yellow and dry (8-10 months)",
+        "curing": "Boil, dry, and cure for maximum curcumin content",
+        "preparation": "Set up soilless system, source disease-free seed rhizomes",
+        "marketing": "Target health food stores, co-ops - emphasize FRESH, HIGH CURCUMIN"
+      }
+    }
+  },
+  
+  "weatherConcerns": {
+    "rainy_season": {
+      "months": "November-March",
+      "rainfall": "Up to 200+ inches total",
+      "risks": ["Root rot", "Fungal diseases", "Flooding"],
+      "actions": ["Improve drainage", "Reduce watering", "Monitor for disease"]
+    },
+    "dry_season": {
+      "months": "April-October",
+      "rainfall": "Lower but still significant",
+      "risks": ["Water stress", "Slower growth"],
+      "actions": ["Maintain irrigation", "Mulch to retain moisture"]
+    }
+  },
+  
+  "preparationSteps": {
+    "beforePlanting": [
+      "Soil test for pH and nutrients",
+      "Build hydroponic/soilless systems for ginger & turmeric",
+      "Construct vanilla trellises (6ft tall, sturdy)",
+      "Install irrigation system with zones for each crop",
+      "Source certified disease-free planting material",
+      "Build shade structures (50% shade for māmaki, vanilla)",
+      "Create composting area for organic matter"
+    ],
+    "firstMonth": [
+      "Plant māmaki (50 plants, 4x8ft spacing)",
+      "Plant ginger in coir bags (disease-free rhizomes)",
+      "Plant turmeric in coir bags (disease-free rhizomes)",
+      "Establish vanilla vines on trellises",
+      "Wait on finger limes (research varieties first)"
+    ],
+    "ongoing": [
+      "Monitor weather daily (Hawaiian Acres gets 150-200in rain!)",
+      "Scout for pests/diseases weekly",
+      "Hand-pollinate vanilla flowers at DAWN during bloom",
+      "Build relationships with buyers BEFORE harvest",
+      "Keep detailed records of expenses, yields, weather"
+    ]
+  }
+}
