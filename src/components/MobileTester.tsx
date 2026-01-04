@@ -25,12 +25,12 @@ export default function MobileTester() {
   const pages = [
     { path: '/', name: '🏝️ Home' },
     { path: '/dashboard', name: '📊 Dashboard' },
-    { path: '/test-crops', name: '🌱 Test Crops' },
-    { path: '/choose-leila', name: '👑 Choose Leila' }
+    { path: '/test-crops', name: '🌱 Crops' },
+    { path: '/choose-leila', name: '👑 Leila' }
   ];
 
   const currentDimensions = devices[device][orientation];
-  const scale = device === 'phone' ? 1 : device === 'tablet' ? 0.7 : 0.5;
+  const scale = device === 'phone' ? 0.8 : device === 'tablet' ? 0.6 : 0.4;
 
   return (
     <div className="bg-white/10 p-6 rounded-xl border-2 border-blue-500/40">
@@ -70,7 +70,6 @@ export default function MobileTester() {
           className="px-4 py-3 bg-purple-600 text-white rounded-lg font-bold flex items-center gap-2"
         >
           <RotateCw className="w-5 h-5" />
-          Rotate
         </button>
       </div>
 
@@ -102,10 +101,10 @@ export default function MobileTester() {
         <p className="text-white/60 text-sm">Scale: {(scale * 100).toFixed(0)}%</p>
       </div>
 
-      {/* MOBILE PREVIEW */}
-      <div className="bg-gray-900 p-8 rounded-xl flex items-center justify-center overflow-auto" style={{ minHeight: '600px' }}>
+      {/* MOBILE PREVIEW - NOW SCROLLABLE! */}
+      <div className="bg-gray-900 p-8 rounded-xl flex items-start justify-center" style={{ height: '700px', overflow: 'auto' }}>
         <div
-          className="bg-black rounded-3xl shadow-2xl overflow-hidden relative"
+          className="bg-black rounded-3xl shadow-2xl relative flex-shrink-0"
           style={{
             width: `${currentDimensions.width * scale}px`,
             height: `${currentDimensions.height * scale}px`,
@@ -114,18 +113,22 @@ export default function MobileTester() {
         >
           {/* PHONE NOTCH */}
           {device === 'phone' && orientation === 'portrait' && (
-            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-black rounded-b-2xl z-50"></div>
+            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-5 bg-black rounded-b-2xl z-50"></div>
           )}
           
-          {/* IFRAME */}
-          <iframe
-            src={currentPage}
-            className="w-full h-full"
-            style={{
-              transform: `scale(1)`,
-              transformOrigin: 'top left'
-            }}
-          />
+          {/* IFRAME - FULLY SCROLLABLE */}
+          <div className="w-full h-full overflow-auto rounded-3xl">
+            <iframe
+              src={currentPage}
+              className="w-full border-0"
+              style={{
+                width: `${currentDimensions.width}px`,
+                height: `${currentDimensions.height}px`,
+                transform: `scale(${scale})`,
+                transformOrigin: 'top left'
+              }}
+            />
+          </div>
         </div>
       </div>
 
@@ -133,11 +136,11 @@ export default function MobileTester() {
       <div className="mt-4 bg-yellow-900/40 p-4 rounded-lg border-2 border-yellow-500/40">
         <p className="text-yellow-400 font-bold mb-2">💡 Tips:</p>
         <ul className="text-white/80 text-sm space-y-1">
-          <li>• Scroll inside the preview to test long pages</li>
+          <li>• Scroll the OUTER frame to see full page</li>
+          <li>• Scroll INSIDE the phone to test scrolling</li>
           <li>• Click buttons and test interactions</li>
           <li>• Rotate to test landscape mode</li>
-          <li>• Phone = iPhone 8 size (375×667)</li>
-          <li>• Tablet = iPad size (768×1024)</li>
+          <li>• Test all pages to check mobile formatting</li>
         </ul>
       </div>
     </div>
