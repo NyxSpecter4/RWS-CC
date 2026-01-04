@@ -21,20 +21,26 @@ async function handleRequest() {
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+    // ULTIMATE PHOTOREALISTIC PROMPT from DeepSeek research
+    const prompt = `Photorealistic portrait of a Hawaiian-Japanese goddess, medium format photograph shot on Hasselblad camera with 80mm f/2.8 lens. Subject is a beautiful mixed-heritage woman in her 30s with warm golden-brown skin, elegant almond-shaped eyes with gentle upward tilt, delicate nose bridge, full graceful lips with subtle natural smile. Long flowing black hair with soft natural waves, adorned with traditional Hawaiian lei po'o of white plumeria flowers and vibrant green maile leaves, interspersed with delicate Japanese kanzashi hairpins featuring mother-of-pearl inlay. She wears contemporary interpretation of Hawaiian kīhei shoulder garment made from fine undyed kapa cloth with subtle geometric water and growth patterns, draped like Japanese kimono collar. Simple gold necklace with Hawaiian ipu gourd pendant at collarbone. Expression is serene, wise, nurturing, embodying spirit of Laka goddess of growth and compassionate dignity of Kannon. Cinematic Rembrandt lighting highlights cheekbones, creates soft natural glow. Background is soft misty foliage of Hawaiian rainforest at dawn. Hyper-detailed with realistic skin texture showing visible pores, individual hair strands catching light, lifelike moisture on flowers. Professional high-fashion editorial photography, dramatic portrait, National Geographic quality, 8k resolution. Natural skin imperfections, subtle skin shine, authentic details.`;
+
     const response = await openai.images.generate({
       model: "dall-e-3",
-      prompt: "Beautiful Hawaiian-Japanese goddess portrait, warm golden-brown skin, almond eyes, gentle smile, black hair with purple highlights, white plumeria flowers, golden glow on forehead, traditional lei, elegant serene expression, purple to black gradient background, Studio Ghibli style",
+      prompt: prompt,
       n: 1,
       size: "1024x1024",
-      quality: "hd"
+      quality: "hd",
+      style: "natural" // CRITICAL: natural style, not vivid
     });
 
     return NextResponse.json({ 
       success: true,
-      imageUrl: response.data[0].url 
+      imageUrl: response.data[0].url,
+      prompt_used: "Photorealistic Hawaiian-Japanese goddess with authentic cultural elements"
     });
 
   } catch (error: any) {
+    console.error('Goddess generation error:', error);
     return NextResponse.json({ 
       success: false,
       imageUrl: null,
