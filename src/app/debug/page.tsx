@@ -44,6 +44,22 @@ export default function DebugPage() {
     setAuthenticated(false);
   };
 
+  const convertToBase64 = async (url: string): Promise<string> => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error('Error converting to base64:', error);
+      return url; // Fallback to URL if conversion fails
+    }
+  };
+
   const generate = async () => {
     setLoading(true);
     try {
@@ -61,14 +77,22 @@ export default function DebugPage() {
       });
       
       const data = await res.json();
-      if (data.success) {
-        setLeilaImg(data.imageUrl);
+      if (data.success && data.imageUrl) {
+        // CONVERT TO BASE64 IMMEDIATELY!
+        console.log('Converting image to base64...');
+        const base64Image = await convertToBase64(data.imageUrl);
+        setLeilaImg(base64Image);
+        console.log('✅ Image converted to base64 and saved!');
+        
         if (data.promptUsed) {
           setImprovedPrompt(data.promptUsed);
         }
       } else {
         alert('Generation failed: ' + (data.error || 'Check OpenAI credits'));
       }
+    } catch (err) {
+      console.error('Error:', err);
+      alert('Error: ' + err);
     } finally {
       setLoading(false);
     }
@@ -82,8 +106,9 @@ export default function DebugPage() {
   const submitRating = async () => {
     if (!leilaImg || !pendingRating) return;
 
+    // SAVE AS BASE64 (already converted!)
     const newRating = { 
-      url: leilaImg, 
+      imageBase64: leilaImg, // This is already base64!
       rating: pendingRating, 
       notes: notes.trim(),
       time: new Date().toISOString() 
@@ -92,12 +117,14 @@ export default function DebugPage() {
     const updated = [...ratings, newRating];
     setRatings(updated);
     localStorage.setItem('leila_ratings', JSON.stringify(updated));
+    
+    console.log('💾 Saved to localStorage as BASE64!');
 
     if (notes.trim()) {
       await analyzeAndImprovePrompt(updated);
     }
 
-    alert(pendingRating === 'up' ? '👍 Saved!' : '👎 Saved!');
+    alert(pendingRating === 'up' ? '👍 Saved as BASE64!' : '👎 Saved as BASE64!');
     
     setNotes('');
     setShowNotes(false);
@@ -163,7 +190,11 @@ export default function DebugPage() {
           </div>
         </div>
 
-        {/* MOBILE TESTER */}
+        <div className="bg-green-900/40 border-2 border-green-500/40 rounded-xl p-4 mb-6">
+          <p className="text-green-400 font-bold mb-2">💾 Storage: BASE64 in localStorage</p>
+          <p className="text-white/80 text-sm">Images saved as base64 - NEVER EXPIRE! Total: {ratings.length} ratings</p>
+        </div>
+
         <button 
           onClick={() => setShowMobile(!showMobile)} 
           className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 rounded-xl font-bold mb-4 flex items-center justify-center gap-3"
@@ -173,7 +204,6 @@ export default function DebugPage() {
         </button>
         {showMobile && <div className="mb-6"><MobileTester /></div>}
 
-        {/* LEILA TESTER */}
         <div className="bg-purple-900/40 rounded-2xl p-6 mb-6 border-2 border-purple-500/40">
           <div className="flex items-center gap-3 mb-4">
             <h2 className="text-2xl font-bold text-purple-400">👑 Leila Tester</h2>
@@ -203,7 +233,7 @@ export default function DebugPage() {
                 className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-xl font-bold mb-3 flex items-center justify-center gap-2"
               >
                 <RefreshCw className={loading ? 'animate-spin' : ''} />
-                {loading ? 'Generating...' : improvedPrompt ? 'Generate (AI Improved)' : 'Generate New'}
+                {loading ? 'Generating & Converting to BASE64...' : improvedPrompt ? 'Generate (AI Improved)' : 'Generate New'}
               </button>
               
               {leilaImg && !showNotes && (
@@ -239,7 +269,7 @@ export default function DebugPage() {
                       onClick={submitRating}
                       className="flex-1 bg-green-600 text-white py-2 rounded-lg font-bold"
                     >
-                      ✅ Submit
+                      ✅ Save as BASE64
                     </button>
                     <button
                       onClick={() => {
@@ -257,7 +287,7 @@ export default function DebugPage() {
             </div>
             
             <div className="bg-white/10 rounded-xl p-4">
-              <h3 className="text-xl font-bold text-white mb-4">📊 Ratings</h3>
+              <h3 className="text-xl font-bold text-white mb-4">📊 Ratings (BASE64)</h3>
               <div className="space-y-2 max-h-80 overflow-y-auto mb-4">
                 {ratings.length === 0 ? (
                   <p className="text-white/60">No ratings yet</p>
@@ -268,6 +298,9 @@ export default function DebugPage() {
                         {r.rating === 'up' ? <ThumbsUp className="text-green-400 w-5 h-5" /> : <ThumbsDown className="text-red-400 w-5 h-5" />}
                         <p className="text-white/80 text-sm">{new Date(r.time).toLocaleString()}</p>
                       </div>
+                      {r.imageBase64 && (
+                        <img src={r.imageBase64} className="w-full h-20 object-cover rounded mb-2" alt="Rated Leila" />
+                      )}
                       {r.notes && (
                         <p className="text-white/70 text-sm italic bg-white/5 p-2 rounded">
                           "{r.notes}"

@@ -8,9 +8,7 @@ export default function CelestialAltar() {
   const [speech, setSpeech] = useState('Aloha e! I am Leila, your AI farm advisor.');
   const [chatOpen, setChatOpen] = useState(true);
   const [availableLeilas, setAvailableLeilas] = useState<string[]>([]);
-  const [imageError, setImageError] = useState(false);
 
-  // FALLBACK IMAGE - Beautiful Hawaiian goddess emoji/placeholder
   const FALLBACK_IMAGE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23902F9B'/%3E%3Cstop offset='100%25' style='stop-color:%23FD437D'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='400' height='400' fill='url(%23g)'/%3E%3Ctext x='200' y='200' font-size='120' text-anchor='middle' dominant-baseline='middle'%3E👸%3C/text%3E%3Ctext x='200' y='300' font-size='24' fill='white' text-anchor='middle' font-family='Arial'%3ELeila%3C/text%3E%3C/svg%3E";
 
   useEffect(() => {
@@ -30,19 +28,21 @@ export default function CelestialAltar() {
       
       if (savedRatings) {
         const ratings = JSON.parse(savedRatings);
+        
+        // Get BASE64 images from ratings
         const likedLeilas = ratings
-          .filter((r: any) => r.rating === 'up')
-          .map((r: any) => r.url);
+          .filter((r: any) => r.rating === 'up' && r.imageBase64)
+          .map((r: any) => r.imageBase64);
         
         if (likedLeilas.length > 0) {
           setAvailableLeilas(likedLeilas);
           const randomLeila = likedLeilas[Math.floor(Math.random() * likedLeilas.length)];
           setGoddessImage(randomLeila);
+          console.log('✅ Loaded BASE64 Leila from localStorage!');
           return;
         }
       }
       
-      // Use fallback if no saved Leilas
       setGoddessImage(FALLBACK_IMAGE);
     } catch (e) {
       console.error('Error loading Leila:', e);
@@ -54,14 +54,7 @@ export default function CelestialAltar() {
     if (availableLeilas.length > 0) {
       const randomLeila = availableLeilas[Math.floor(Math.random() * availableLeilas.length)];
       setGoddessImage(randomLeila);
-      setImageError(false);
     }
-  };
-
-  const handleImageError = () => {
-    console.log('Image failed to load, using fallback');
-    setImageError(true);
-    setGoddessImage(FALLBACK_IMAGE);
   };
 
   const getSmartGuidance = async () => {
@@ -138,35 +131,25 @@ export default function CelestialAltar() {
                 </linearGradient>
               </defs>
               <circle cx="88" cy="88" r="86" fill="none" stroke="url(#kapaGradient)" strokeWidth="16"/>
-              <circle cx="88" cy="88" r="78" fill="none" stroke="url(#kapaGradient)" strokeWidth="4" opacity="0.8"/>
             </svg>
 
             {goddessImage ? (
               <div className="absolute inset-3 rounded-full overflow-hidden shadow-2xl">
-                <img 
-                  src={goddessImage} 
-                  alt="Leila" 
-                  className="w-full h-full object-cover"
-                  onError={handleImageError}
-                />
+                <img src={goddessImage} alt="Leila" className="w-full h-full object-cover" />
                 {availableLeilas.length > 1 && (
                   <button
                     onClick={changeLeilaImage}
                     className="absolute bottom-0 right-0 w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700"
-                    title="Change Leila"
                   >
                     <RefreshCw className="w-4 h-4 text-white" />
                   </button>
                 )}
               </div>
             ) : (
-              <a 
-                href="/debug"
-                className="absolute inset-3 rounded-full bg-gradient-to-br from-[#902F9B] to-[#FD437D] flex items-center justify-center shadow-2xl hover:scale-105 transition-all"
-              >
+              <a href="/debug" className="absolute inset-3 rounded-full bg-gradient-to-br from-[#902F9B] to-[#FD437D] flex items-center justify-center shadow-2xl hover:scale-105 transition-all">
                 <div className="text-center px-2">
                   <p className="text-white font-bold text-xs">Go to Debug</p>
-                  <p className="text-white/80 text-[10px]">Rate some Leilas!</p>
+                  <p className="text-white/80 text-[10px]">Rate Leilas!</p>
                 </div>
               </a>
             )}
@@ -188,7 +171,7 @@ export default function CelestialAltar() {
 
           {!chatOpen && (
             <button onClick={() => setChatOpen(true)} className="absolute top-full right-0 mt-3 px-4 py-2 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 text-sm">
-              💬 Open Chat
+              💬 Chat
             </button>
           )}
         </div>
@@ -210,7 +193,7 @@ export default function CelestialAltar() {
           <div className="text-center mb-2 md:mb-3">
             <p className="text-white font-bold text-sm md:text-lg">🌱 1-Acre Regenerative Farm</p>
             <p className="text-yellow-400 font-black text-lg md:text-2xl">$0/month</p>
-            <p className="text-white/60 text-xs">Year 1 - Establishment</p>
+            <p className="text-white/60 text-xs">Year 1</p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 md:gap-3 mb-16 md:mb-4">
             {farmPlan.crops.map((crop) => (
@@ -230,7 +213,7 @@ export default function CelestialAltar() {
 
       <div className="fixed bottom-3 left-3 md:bottom-4 md:left-4 z-50 flex gap-2">
         <a href="/dashboard" className="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-bold hover:scale-105 transition-all shadow-2xl text-sm md:text-base">
-          �� Dashboard
+          📊 Dashboard
         </a>
         <a href="/debug" className="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold hover:scale-105 transition-all shadow-2xl text-sm md:text-base">
           🔧 Debug
