@@ -46,7 +46,6 @@ export default function DebugPage() {
 
   const convertToBase64ServerSide = async (url: string): Promise<string> => {
     try {
-      console.log('🔄 Converting via server...');
       const response = await fetch('/api/convert-to-base64', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -55,23 +54,20 @@ export default function DebugPage() {
       
       const data = await response.json();
       if (data.success && data.base64) {
-        console.log('✅ Server conversion successful!');
         return data.base64;
       } else {
         throw new Error(data.error || 'Conversion failed');
       }
     } catch (error) {
-      console.error('❌ Server conversion failed:', error);
-      return url; // Fallback to URL
+      console.error('Conversion failed:', error);
+      return url;
     }
   };
 
   const generate = async () => {
     setLoading(true);
     try {
-      const endpoint = improvedPrompt 
-        ? '/api/generate-leila-smart'
-        : '/api/generate-goddess';
+      const endpoint = improvedPrompt ? '/api/generate-leila-smart' : '/api/generate-goddess';
       
       const res = await fetch(endpoint, { 
         method: 'POST',
@@ -84,7 +80,6 @@ export default function DebugPage() {
       
       const data = await res.json();
       if (data.success && data.imageUrl) {
-        // CONVERT TO BASE64 VIA SERVER (bypasses CORS!)
         const base64Image = await convertToBase64ServerSide(data.imageUrl);
         setLeilaImg(base64Image);
         
@@ -94,9 +89,6 @@ export default function DebugPage() {
       } else {
         alert('Generation failed: ' + (data.error || 'Check OpenAI credits'));
       }
-    } catch (err) {
-      console.error('Error:', err);
-      alert('Error: ' + err);
     } finally {
       setLoading(false);
     }
@@ -120,8 +112,6 @@ export default function DebugPage() {
     const updated = [...ratings, newRating];
     setRatings(updated);
     localStorage.setItem('leila_ratings', JSON.stringify(updated));
-    
-    console.log('💾 Saved as BASE64!');
 
     if (notes.trim()) {
       await analyzeAndImprovePrompt(updated);
@@ -145,10 +135,9 @@ export default function DebugPage() {
       const data = await res.json();
       if (data.success && data.improvedPrompt) {
         setImprovedPrompt(data.improvedPrompt);
-        console.log('✨ Improved prompt:', data.improvedPrompt);
       }
     } catch (error) {
-      console.error('Error analyzing:', error);
+      console.error('Error:', error);
     }
   };
 
@@ -170,23 +159,19 @@ export default function DebugPage() {
               autoFocus
             />
             {error && <p className="text-red-400 text-center mb-4">{error}</p>}
-            <button className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-xl">
-              🔓 Unlock
-            </button>
+            <button className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-xl">🔓 Unlock</button>
           </form>
-          <a href="/" className="block text-center mt-6 bg-purple-600 text-white py-3 rounded-xl font-bold">
-            🏝️ Home
-          </a>
+          <a href="/" className="block text-center mt-6 bg-purple-600 text-white py-3 rounded-xl font-bold">🏝️ Home</a>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#020103] via-[#1a0b2e] to-[#020103] p-4">
-      <div className="max-w-6xl mx-auto pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-[#020103] via-[#1a0b2e] to-[#020103] overflow-y-auto">
+      <div className="max-w-6xl mx-auto p-4 pb-32">
         
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-6 sticky top-0 bg-gradient-to-br from-[#020103] via-[#1a0b2e] to-[#020103] z-50 py-4">
           <h1 className="text-3xl font-black text-white">🔧 DEBUG</h1>
           <div className="flex gap-3">
             <button onClick={logout} className="px-4 py-2 bg-red-600 text-white rounded-lg font-bold">🔒 Lock</button>
@@ -195,14 +180,11 @@ export default function DebugPage() {
         </div>
 
         <div className="bg-green-900/40 border-2 border-green-500/40 rounded-xl p-4 mb-6">
-          <p className="text-green-400 font-bold mb-2">�� Storage: BASE64 in localStorage</p>
-          <p className="text-white/80 text-sm">Images saved as base64 - NEVER EXPIRE! Total: {ratings.length} ratings</p>
+          <p className="text-green-400 font-bold mb-2">💾 Storage: BASE64 in localStorage</p>
+          <p className="text-white/80 text-sm">Total: {ratings.length} ratings</p>
         </div>
 
-        <button 
-          onClick={() => setShowMobile(!showMobile)} 
-          className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 rounded-xl font-bold mb-4 flex items-center justify-center gap-3"
-        >
+        <button onClick={() => setShowMobile(!showMobile)} className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 rounded-xl font-bold mb-4 flex items-center justify-center gap-3">
           <Smartphone className="w-8 h-8" />
           {showMobile ? 'HIDE' : 'SHOW'} MOBILE TESTER
         </button>
@@ -214,7 +196,7 @@ export default function DebugPage() {
             {improvedPrompt && (
               <div className="flex items-center gap-2 bg-green-900/40 px-3 py-1 rounded-full">
                 <Sparkles className="w-4 h-4 text-green-400" />
-                <span className="text-green-400 text-sm font-bold">AI Learning Active</span>
+                <span className="text-green-400 text-sm font-bold">AI Learning</span>
               </div>
             )}
           </div>
@@ -231,27 +213,17 @@ export default function DebugPage() {
                 )}
               </div>
               
-              <button
-                onClick={generate}
-                disabled={loading}
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-xl font-bold mb-3 flex items-center justify-center gap-2 disabled:opacity-50"
-              >
+              <button onClick={generate} disabled={loading} className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-xl font-bold mb-3 flex items-center justify-center gap-2 disabled:opacity-50">
                 <RefreshCw className={loading ? 'animate-spin' : ''} />
                 {loading ? 'Generating...' : 'Generate New'}
               </button>
               
               {leilaImg && !showNotes && (
                 <div className="grid grid-cols-2 gap-3">
-                  <button 
-                    onClick={() => startRating('up')} 
-                    className="bg-green-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2"
-                  >
+                  <button onClick={() => startRating('up')} className="bg-green-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2">
                     <ThumbsUp /> Like
                   </button>
-                  <button 
-                    onClick={() => startRating('down')} 
-                    className="bg-red-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2"
-                  >
+                  <button onClick={() => startRating('down')} className="bg-red-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2">
                     <ThumbsDown /> Dislike
                   </button>
                 </div>
@@ -262,26 +234,10 @@ export default function DebugPage() {
                   <p className="text-yellow-400 font-bold mb-3">
                     {pendingRating === 'up' ? '👍 What do you LIKE?' : '👎 What do you DISLIKE?'}
                   </p>
-                  <textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    className="w-full bg-white/20 text-white p-3 rounded-lg mb-3 min-h-24"
-                    placeholder="e.g., 'Love the hair but want to see ALL of it from top to bottom'"
-                  />
+                  <textarea value={notes} onChange={(e) => setNotes(e.target.value)} className="w-full bg-white/20 text-white p-3 rounded-lg mb-3 min-h-24" placeholder="Explain..." />
                   <div className="flex gap-3">
-                    <button onClick={submitRating} className="flex-1 bg-green-600 text-white py-2 rounded-lg font-bold">
-                      ✅ Save
-                    </button>
-                    <button
-                      onClick={() => {
-                        setShowNotes(false);
-                        setPendingRating(null);
-                        setNotes('');
-                      }}
-                      className="flex-1 bg-gray-600 text-white py-2 rounded-lg font-bold"
-                    >
-                      Cancel
-                    </button>
+                    <button onClick={submitRating} className="flex-1 bg-green-600 text-white py-2 rounded-lg font-bold">✅ Save</button>
+                    <button onClick={() => { setShowNotes(false); setPendingRating(null); setNotes(''); }} className="flex-1 bg-gray-600 text-white py-2 rounded-lg font-bold">Cancel</button>
                   </div>
                 </div>
               )}
@@ -291,7 +247,7 @@ export default function DebugPage() {
               <h3 className="text-xl font-bold text-white mb-4">📊 Ratings</h3>
               <div className="space-y-2 max-h-80 overflow-y-auto mb-4">
                 {ratings.length === 0 ? (
-                  <p className="text-white/60">No ratings yet</p>
+                  <p className="text-white/60">No ratings</p>
                 ) : (
                   ratings.slice().reverse().map((r, i) => (
                     <div key={i} className="bg-white/5 p-3 rounded">
@@ -299,12 +255,8 @@ export default function DebugPage() {
                         {r.rating === 'up' ? <ThumbsUp className="text-green-400 w-5 h-5" /> : <ThumbsDown className="text-red-400 w-5 h-5" />}
                         <p className="text-white/80 text-sm">{new Date(r.time).toLocaleString()}</p>
                       </div>
-                      {r.imageBase64 && (
-                        <img src={r.imageBase64} className="w-full h-20 object-cover rounded mb-2" alt="Rated" />
-                      )}
-                      {r.notes && (
-                        <p className="text-white/70 text-sm italic bg-white/5 p-2 rounded">"{r.notes}"</p>
-                      )}
+                      {r.imageBase64 && <img src={r.imageBase64} className="w-full h-20 object-cover rounded mb-2" alt="Rated" />}
+                      {r.notes && <p className="text-white/70 text-sm italic bg-white/5 p-2 rounded">"{r.notes}"</p>}
                     </div>
                   ))
                 )}
@@ -328,7 +280,7 @@ export default function DebugPage() {
         </button>
         {showV1 && <div className="mb-6"><ExpertPanel /></div>}
 
-        <div className="bg-white/10 p-6 rounded-xl">
+        <div className="bg-white/10 p-6 rounded-xl mb-6">
           <h3 className="text-2xl font-bold text-white mb-4">🧪 Test Tools</h3>
           <div className="grid grid-cols-4 gap-4">
             <a href="/test-crops" className="bg-green-600 text-white py-4 rounded-xl font-bold text-center">🌱 Crops</a>
@@ -337,6 +289,8 @@ export default function DebugPage() {
             <a href="/dashboard" className="bg-blue-600 text-white py-4 rounded-xl font-bold text-center">📊 Dashboard</a>
           </div>
         </div>
+
+        <div className="h-20"></div>
       </div>
     </div>
   );
