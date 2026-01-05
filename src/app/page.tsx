@@ -25,27 +25,19 @@ export default function CelestialAltar() {
   const loadRandomLikedLeila = () => {
     try {
       const savedRatings = localStorage.getItem('leila_ratings');
-      
       if (savedRatings) {
         const ratings = JSON.parse(savedRatings);
-        
-        // Get BASE64 images from ratings
-        const likedLeilas = ratings
-          .filter((r: any) => r.rating === 'up' && r.imageBase64)
-          .map((r: any) => r.imageBase64);
-        
+        const likedLeilas = ratings.filter((r: any) => r.rating === 'up' && r.imageBase64).map((r: any) => r.imageBase64);
         if (likedLeilas.length > 0) {
           setAvailableLeilas(likedLeilas);
           const randomLeila = likedLeilas[Math.floor(Math.random() * likedLeilas.length)];
           setGoddessImage(randomLeila);
-          console.log('✅ Loaded BASE64 Leila from localStorage!');
+          console.log('✅ Loaded BASE64 Leila!');
           return;
         }
       }
-      
       setGoddessImage(FALLBACK_IMAGE);
     } catch (e) {
-      console.error('Error loading Leila:', e);
       setGoddessImage(FALLBACK_IMAGE);
     }
   };
@@ -69,14 +61,11 @@ export default function CelestialAltar() {
           soilData: { organic_matter: 4.1, last_knf: 'IMO #3' }
         })
       });
-      
       if (res.ok) {
         const data = await res.json();
         setSpeech(data.speech || 'Aloha! Plant with the moon! 🌙');
       }
-    } catch (e) {
-      console.error(e);
-    }
+    } catch (e) {}
   };
 
   const phaseData = {
@@ -119,9 +108,11 @@ export default function CelestialAltar() {
         </svg>
       </div>
 
+      {/* LEILA WITH HAWAIIAN BORDER RESTORED */}
       <div className="fixed top-4 right-4 md:top-6 md:right-6 z-50">
         <div className="relative">
           <div className="relative w-32 h-32 md:w-44 md:h-44">
+            {/* HAWAIIAN KAPA PATTERN BORDER */}
             <svg className="absolute inset-0 w-full h-full" viewBox="0 0 176 176">
               <defs>
                 <linearGradient id="kapaGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -129,18 +120,26 @@ export default function CelestialAltar() {
                   <stop offset="50%" stopColor="#FD437D" />
                   <stop offset="100%" stopColor="#FFE573" />
                 </linearGradient>
+                <pattern id="nihoPalaoa" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+                  <path d="M 0,12 L 12,0 L 12,24 Z" fill="url(#kapaGradient)" opacity="0.9"/>
+                  <path d="M 24,12 L 12,0 L 12,24 Z" fill="url(#kapaGradient)" opacity="0.6"/>
+                  <path d="M 6,12 L 9,9 L 9,15 Z" fill="#FFE573" opacity="0.8"/>
+                  <path d="M 18,12 L 15,9 L 15,15 Z" fill="#902F9B" opacity="0.7"/>
+                </pattern>
               </defs>
-              <circle cx="88" cy="88" r="86" fill="none" stroke="url(#kapaGradient)" strokeWidth="16"/>
+              <circle cx="88" cy="88" r="86" fill="none" stroke="url(#nihoPalaoa)" strokeWidth="16"/>
+              <circle cx="88" cy="88" r="78" fill="none" stroke="url(#kapaGradient)" strokeWidth="4" opacity="0.8"/>
+              <circle cx="88" cy="2" r="3" fill="#FFE573" opacity="0.9"/>
+              <circle cx="174" cy="88" r="3" fill="#FFE573" opacity="0.9"/>
+              <circle cx="88" cy="174" r="3" fill="#FFE573" opacity="0.9"/>
+              <circle cx="2" cy="88" r="3" fill="#FFE573" opacity="0.9"/>
             </svg>
 
             {goddessImage ? (
               <div className="absolute inset-3 rounded-full overflow-hidden shadow-2xl">
                 <img src={goddessImage} alt="Leila" className="w-full h-full object-cover" />
                 {availableLeilas.length > 1 && (
-                  <button
-                    onClick={changeLeilaImage}
-                    className="absolute bottom-0 right-0 w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700"
-                  >
+                  <button onClick={changeLeilaImage} className="absolute bottom-0 right-0 w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700">
                     <RefreshCw className="w-4 h-4 text-white" />
                   </button>
                 )}
@@ -148,8 +147,8 @@ export default function CelestialAltar() {
             ) : (
               <a href="/debug" className="absolute inset-3 rounded-full bg-gradient-to-br from-[#902F9B] to-[#FD437D] flex items-center justify-center shadow-2xl hover:scale-105 transition-all">
                 <div className="text-center px-2">
-                  <p className="text-white font-bold text-xs">Go to Debug</p>
-                  <p className="text-white/80 text-[10px]">Rate Leilas!</p>
+                  <p className="text-white font-bold text-xs">Debug</p>
+                  <p className="text-white/80 text-[10px]">Rate Leilas</p>
                 </div>
               </a>
             )}
@@ -170,9 +169,7 @@ export default function CelestialAltar() {
           )}
 
           {!chatOpen && (
-            <button onClick={() => setChatOpen(true)} className="absolute top-full right-0 mt-3 px-4 py-2 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 text-sm">
-              💬 Chat
-            </button>
+            <button onClick={() => setChatOpen(true)} className="absolute top-full right-0 mt-3 px-4 py-2 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 text-sm">💬</button>
           )}
         </div>
       </div>
@@ -212,12 +209,8 @@ export default function CelestialAltar() {
       </div>
 
       <div className="fixed bottom-3 left-3 md:bottom-4 md:left-4 z-50 flex gap-2">
-        <a href="/dashboard" className="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-bold hover:scale-105 transition-all shadow-2xl text-sm md:text-base">
-          📊 Dashboard
-        </a>
-        <a href="/debug" className="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold hover:scale-105 transition-all shadow-2xl text-sm md:text-base">
-          🔧 Debug
-        </a>
+        <a href="/dashboard" className="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-bold hover:scale-105 transition-all shadow-2xl text-sm md:text-base">📊 Dashboard</a>
+        <a href="/debug" className="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold hover:scale-105 transition-all shadow-2xl text-sm md:text-base">🔧 Debug</a>
       </div>
 
       <style jsx>{`@keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }`}</style>
