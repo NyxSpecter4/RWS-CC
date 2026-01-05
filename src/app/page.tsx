@@ -8,6 +8,10 @@ export default function CelestialAltar() {
   const [speech, setSpeech] = useState('Aloha e! I am Leila, your AI farm advisor.');
   const [chatOpen, setChatOpen] = useState(true);
   const [availableLeilas, setAvailableLeilas] = useState<string[]>([]);
+  const [imageError, setImageError] = useState(false);
+
+  // FALLBACK IMAGE - Beautiful Hawaiian goddess emoji/placeholder
+  const FALLBACK_IMAGE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23902F9B'/%3E%3Cstop offset='100%25' style='stop-color:%23FD437D'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='400' height='400' fill='url(%23g)'/%3E%3Ctext x='200' y='200' font-size='120' text-anchor='middle' dominant-baseline='middle'%3E👸%3C/text%3E%3Ctext x='200' y='300' font-size='24' fill='white' text-anchor='middle' font-family='Arial'%3ELeila%3C/text%3E%3C/svg%3E";
 
   useEffect(() => {
     const day = new Date().getDate();
@@ -16,47 +20,48 @@ export default function CelestialAltar() {
     else if (day <= 21) setCurrentPhase('Akua');
     else setCurrentPhase('Muku');
 
-    // LOAD FROM SAVED LIKED LEILAS
     loadRandomLikedLeila();
     getSmartGuidance();
   }, []);
 
   const loadRandomLikedLeila = () => {
     try {
-      // Get all ratings from localStorage
       const savedRatings = localStorage.getItem('leila_ratings');
       
       if (savedRatings) {
         const ratings = JSON.parse(savedRatings);
-        
-        // Filter only thumbs-up ratings
         const likedLeilas = ratings
           .filter((r: any) => r.rating === 'up')
           .map((r: any) => r.url);
         
         if (likedLeilas.length > 0) {
           setAvailableLeilas(likedLeilas);
-          // Pick a random one from liked images
           const randomLeila = likedLeilas[Math.floor(Math.random() * likedLeilas.length)];
           setGoddessImage(randomLeila);
           return;
         }
       }
       
-      // If no liked Leilas, show placeholder
-      setGoddessImage('');
+      // Use fallback if no saved Leilas
+      setGoddessImage(FALLBACK_IMAGE);
     } catch (e) {
       console.error('Error loading Leila:', e);
-      setGoddessImage('');
+      setGoddessImage(FALLBACK_IMAGE);
     }
   };
 
   const changeLeilaImage = () => {
-    // Cycle through liked Leilas
     if (availableLeilas.length > 0) {
       const randomLeila = availableLeilas[Math.floor(Math.random() * availableLeilas.length)];
       setGoddessImage(randomLeila);
+      setImageError(false);
     }
+  };
+
+  const handleImageError = () => {
+    console.log('Image failed to load, using fallback');
+    setImageError(true);
+    setGoddessImage(FALLBACK_IMAGE);
   };
 
   const getSmartGuidance = async () => {
@@ -103,7 +108,6 @@ export default function CelestialAltar() {
   return (
     <div className="min-h-screen relative overflow-hidden bg-[#0a0820] pb-24 md:pb-8">
       
-      {/* SKY */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0820] via-[#1a1540] to-[#2d1b4e]"></div>
         {[...Array(200)].map((_, i) => (
@@ -122,7 +126,6 @@ export default function CelestialAltar() {
         </svg>
       </div>
 
-      {/* LEILA - FROM SAVED LIKED IMAGES */}
       <div className="fixed top-4 right-4 md:top-6 md:right-6 z-50">
         <div className="relative">
           <div className="relative w-32 h-32 md:w-44 md:h-44">
@@ -133,31 +136,28 @@ export default function CelestialAltar() {
                   <stop offset="50%" stopColor="#FD437D" />
                   <stop offset="100%" stopColor="#FFE573" />
                 </linearGradient>
-                <pattern id="nihoPalaoa" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
-                  <path d="M 0,12 L 12,0 L 12,24 Z" fill="url(#kapaGradient)" opacity="0.9"/>
-                  <path d="M 24,12 L 12,0 L 12,24 Z" fill="url(#kapaGradient)" opacity="0.6"/>
-                  <path d="M 6,12 L 9,9 L 9,15 Z" fill="#FFE573" opacity="0.8"/>
-                  <path d="M 18,12 L 15,9 L 15,15 Z" fill="#902F9B" opacity="0.7"/>
-                </pattern>
               </defs>
-              <circle cx="88" cy="88" r="86" fill="none" stroke="url(#nihoPalaoa)" strokeWidth="16"/>
+              <circle cx="88" cy="88" r="86" fill="none" stroke="url(#kapaGradient)" strokeWidth="16"/>
               <circle cx="88" cy="88" r="78" fill="none" stroke="url(#kapaGradient)" strokeWidth="4" opacity="0.8"/>
-              <circle cx="88" cy="2" r="3" fill="#FFE573" opacity="0.9"/>
-              <circle cx="174" cy="88" r="3" fill="#FFE573" opacity="0.9"/>
-              <circle cx="88" cy="174" r="3" fill="#FFE573" opacity="0.9"/>
-              <circle cx="2" cy="88" r="3" fill="#FFE573" opacity="0.9"/>
             </svg>
 
             {goddessImage ? (
               <div className="absolute inset-3 rounded-full overflow-hidden shadow-2xl">
-                <img src={goddessImage} alt="Leila" className="w-full h-full object-cover" />
-                <button
-                  onClick={changeLeilaImage}
-                  className="absolute bottom-0 right-0 w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700"
-                  title="Change Leila"
-                >
-                  <RefreshCw className="w-4 h-4 text-white" />
-                </button>
+                <img 
+                  src={goddessImage} 
+                  alt="Leila" 
+                  className="w-full h-full object-cover"
+                  onError={handleImageError}
+                />
+                {availableLeilas.length > 1 && (
+                  <button
+                    onClick={changeLeilaImage}
+                    className="absolute bottom-0 right-0 w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700"
+                    title="Change Leila"
+                  >
+                    <RefreshCw className="w-4 h-4 text-white" />
+                  </button>
+                )}
               </div>
             ) : (
               <a 
@@ -194,7 +194,6 @@ export default function CelestialAltar() {
         </div>
       </div>
 
-      {/* MOON */}
       <div className="relative z-10 flex flex-col items-center pt-8 md:pt-16">
         <svg width="280" height="280" viewBox="0 0 380 380" className="md:w-[380px] md:h-[380px] filter drop-shadow-[0_0_100px_rgba(255,229,115,0.8)]">
           <defs><radialGradient id="moonGrad"><stop offset="0%" stopColor="#fef9e7" /><stop offset="100%" stopColor="#c8c0a8" /></radialGradient></defs>
@@ -206,7 +205,6 @@ export default function CelestialAltar() {
         </div>
       </div>
 
-      {/* CROPS */}
       <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/95 to-transparent p-3 md:p-4 backdrop-blur-sm z-40 max-h-[45vh] md:max-h-none overflow-y-auto">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-2 md:mb-3">
@@ -230,10 +228,9 @@ export default function CelestialAltar() {
         </div>
       </div>
 
-      {/* NAV */}
       <div className="fixed bottom-3 left-3 md:bottom-4 md:left-4 z-50 flex gap-2">
         <a href="/dashboard" className="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-bold hover:scale-105 transition-all shadow-2xl text-sm md:text-base">
-          📊 Dashboard
+          �� Dashboard
         </a>
         <a href="/debug" className="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold hover:scale-105 transition-all shadow-2xl text-sm md:text-base">
           🔧 Debug
