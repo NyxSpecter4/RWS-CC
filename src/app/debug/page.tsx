@@ -44,19 +44,25 @@ export default function DebugPage() {
     setAuthenticated(false);
   };
 
-  const convertToBase64 = async (url: string): Promise<string> => {
+  const convertToBase64ServerSide = async (url: string): Promise<string> => {
     try {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
+      console.log('🔄 Converting via server...');
+      const response = await fetch('/api/convert-to-base64', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageUrl: url })
       });
+      
+      const data = await response.json();
+      if (data.success && data.base64) {
+        console.log('✅ Server conversion successful!');
+        return data.base64;
+      } else {
+        throw new Error(data.error || 'Conversion failed');
+      }
     } catch (error) {
-      console.error('Error converting to base64:', error);
-      return url; // Fallback to URL if conversion fails
+      console.error('❌ Server conversion failed:', error);
+      return url; // Fallback to URL
     }
   };
 
@@ -78,11 +84,9 @@ export default function DebugPage() {
       
       const data = await res.json();
       if (data.success && data.imageUrl) {
-        // CONVERT TO BASE64 IMMEDIATELY!
-        console.log('Converting image to base64...');
-        const base64Image = await convertToBase64(data.imageUrl);
+        // CONVERT TO BASE64 VIA SERVER (bypasses CORS!)
+        const base64Image = await convertToBase64ServerSide(data.imageUrl);
         setLeilaImg(base64Image);
-        console.log('✅ Image converted to base64 and saved!');
         
         if (data.promptUsed) {
           setImprovedPrompt(data.promptUsed);
@@ -106,9 +110,8 @@ export default function DebugPage() {
   const submitRating = async () => {
     if (!leilaImg || !pendingRating) return;
 
-    // SAVE AS BASE64 (already converted!)
     const newRating = { 
-      imageBase64: leilaImg, // This is already base64!
+      imageBase64: leilaImg,
       rating: pendingRating, 
       notes: notes.trim(),
       time: new Date().toISOString() 
@@ -118,13 +121,13 @@ export default function DebugPage() {
     setRatings(updated);
     localStorage.setItem('leila_ratings', JSON.stringify(updated));
     
-    console.log('💾 Saved to localStorage as BASE64!');
+    console.log('💾 Saved as BASE64!');
 
     if (notes.trim()) {
       await analyzeAndImprovePrompt(updated);
     }
 
-    alert(pendingRating === 'up' ? '👍 Saved as BASE64!' : '👎 Saved as BASE64!');
+    alert(pendingRating === 'up' ? '👍 Saved!' : '👎 Saved!');
     
     setNotes('');
     setShowNotes(false);
@@ -142,6 +145,7 @@ export default function DebugPage() {
       const data = await res.json();
       if (data.success && data.improvedPrompt) {
         setImprovedPrompt(data.improvedPrompt);
+        console.log('✨ Improved prompt:', data.improvedPrompt);
       }
     } catch (error) {
       console.error('Error analyzing:', error);
@@ -179,8 +183,8 @@ export default function DebugPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#020103] via-[#1a0b2e] to-[#020103] p-4 pb-20">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-[#020103] via-[#1a0b2e] to-[#020103] p-4">
+      <div className="max-w-6xl mx-auto pb-20">
         
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-black text-white">🔧 DEBUG</h1>
@@ -191,7 +195,7 @@ export default function DebugPage() {
         </div>
 
         <div className="bg-green-900/40 border-2 border-green-500/40 rounded-xl p-4 mb-6">
-          <p className="text-green-400 font-bold mb-2">💾 Storage: BASE64 in localStorage</p>
+          <p className="text-green-400 font-bold mb-2">�� Storage: BASE64 in localStorage</p>
           <p className="text-white/80 text-sm">Images saved as base64 - NEVER EXPIRE! Total: {ratings.length} ratings</p>
         </div>
 
@@ -230,23 +234,23 @@ export default function DebugPage() {
               <button
                 onClick={generate}
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-xl font-bold mb-3 flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-xl font-bold mb-3 flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 <RefreshCw className={loading ? 'animate-spin' : ''} />
-                {loading ? 'Generating & Converting to BASE64...' : improvedPrompt ? 'Generate (AI Improved)' : 'Generate New'}
+                {loading ? 'Generating...' : 'Generate New'}
               </button>
               
               {leilaImg && !showNotes && (
                 <div className="grid grid-cols-2 gap-3">
                   <button 
                     onClick={() => startRating('up')} 
-                    className="bg-green-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-700"
+                    className="bg-green-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2"
                   >
                     <ThumbsUp /> Like
                   </button>
                   <button 
                     onClick={() => startRating('down')} 
-                    className="bg-red-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-red-700"
+                    className="bg-red-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2"
                   >
                     <ThumbsDown /> Dislike
                   </button>
@@ -262,14 +266,11 @@ export default function DebugPage() {
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     className="w-full bg-white/20 text-white p-3 rounded-lg mb-3 min-h-24"
-                    placeholder="e.g., 'Love the hair and eyes, but face is too angular.'"
+                    placeholder="e.g., 'Love the hair but want to see ALL of it from top to bottom'"
                   />
                   <div className="flex gap-3">
-                    <button
-                      onClick={submitRating}
-                      className="flex-1 bg-green-600 text-white py-2 rounded-lg font-bold"
-                    >
-                      ✅ Save as BASE64
+                    <button onClick={submitRating} className="flex-1 bg-green-600 text-white py-2 rounded-lg font-bold">
+                      ✅ Save
                     </button>
                     <button
                       onClick={() => {
@@ -287,7 +288,7 @@ export default function DebugPage() {
             </div>
             
             <div className="bg-white/10 rounded-xl p-4">
-              <h3 className="text-xl font-bold text-white mb-4">📊 Ratings (BASE64)</h3>
+              <h3 className="text-xl font-bold text-white mb-4">📊 Ratings</h3>
               <div className="space-y-2 max-h-80 overflow-y-auto mb-4">
                 {ratings.length === 0 ? (
                   <p className="text-white/60">No ratings yet</p>
@@ -299,12 +300,10 @@ export default function DebugPage() {
                         <p className="text-white/80 text-sm">{new Date(r.time).toLocaleString()}</p>
                       </div>
                       {r.imageBase64 && (
-                        <img src={r.imageBase64} className="w-full h-20 object-cover rounded mb-2" alt="Rated Leila" />
+                        <img src={r.imageBase64} className="w-full h-20 object-cover rounded mb-2" alt="Rated" />
                       )}
                       {r.notes && (
-                        <p className="text-white/70 text-sm italic bg-white/5 p-2 rounded">
-                          "{r.notes}"
-                        </p>
+                        <p className="text-white/70 text-sm italic bg-white/5 p-2 rounded">"{r.notes}"</p>
                       )}
                     </div>
                   ))
